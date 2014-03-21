@@ -20,16 +20,16 @@
 int main(void){
 
 	unsigned long int i = 0, hits = 0;;
-	unsigned short xsubi[3];
+	unsigned short index[3];
 	long double x = 0, y = 0;
 
-	xsubi[0] = time(NULL);
-	xsubi[1] = time(NULL);
-	seed48(xsubi);
+	index[0] = time(NULL);
+	index[1] = time(NULL);
+	seed48(index);
 
 	for(; i < MAX_INTERACTION; i++){
-		x = erand48(xsubi);
-		y = erand48(xsubi);
+		x = erand48(index);
+		y = erand48(index);
 
 		if((x*x)+(y*y) < 1)
 			hits++;
