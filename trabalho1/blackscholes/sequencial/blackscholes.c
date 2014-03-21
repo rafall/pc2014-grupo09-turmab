@@ -24,10 +24,26 @@
 	_a_temp_ = _a_temp_ < _b_temp_ ? _b_temp_ : _a_temp_; \
 })
 
+long double standard_deviation(long double *data, long int size, long double mean){
+
+	if(0 == size)
+		return 0.0;
+
+	long double mean_difference = 0.0, squared_deviation = 0.0;
+	long int i = 0;
+
+	for(; i < size; i++){
+		mean_difference = data[i] - mean;
+		squared_deviation += mean_difference*mean_difference;
+	}
+
+	return sqrt(squared_deviation/size);
+}
+
 int main(void){
 
 	long double S = 0.0, E = 0.0, r = 0.0, sigma = 0.0, T = 0.0, *trials;
-	long long double sum = 0.0;
+	long double sum = 0.0;
 	long int M = 0, i = 0;
 	unsigned short index[3];
 
@@ -52,6 +68,11 @@ int main(void){
 		trials[i] = exp( (-1*r)*T) * max(t-E, 0);
 		sum += trials[i];
 	}
+
+	long double mean = sum / M;
+	long double confidence_interval = 1.96*(standard_deviation(trials, M, mean)/sqrt(M));
+
+	printf("The confidence interval calculated is [%Lf,%Lf]", mean - confidence_interval, mean + confidence_interval);
 
 	free(trials);
 
