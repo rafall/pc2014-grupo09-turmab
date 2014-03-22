@@ -13,7 +13,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <math.h>
 
 #define max(a,b) ({ \
@@ -23,6 +22,31 @@
 	_b_temp_ = (b); \
 	_a_temp_ = _a_temp_ < _b_temp_ ? _b_temp_ : _a_temp_; \
 })
+
+double gaussrand()
+{
+	static double V1, V2, S;
+	static int phase = 0;
+	double X;
+
+	if(phase == 0) {
+		do {
+			double U1 = (double)rand() / RAND_MAX;
+			double U2 = (double)rand() / RAND_MAX;
+
+			V1 = 2 * U1 - 1;
+			V2 = 2 * U2 - 1;
+			S = V1 * V1 + V2 * V2;
+			} while(S >= 1 || S == 0);
+
+		X = V1 * sqrt(-2 * log(S) / S);
+	} else
+		X = V2 * sqrt(-2 * log(S) / S);
+
+	phase = 1 - phase;
+
+	return X;
+}
 
 long double standard_deviation(long double *data, long int size, long double mean){
 
@@ -45,7 +69,6 @@ int main(void){
 	long double S = 0.0, E = 0.0, r = 0.0, sigma = 0.0, T = 0.0, *trials;
 	long double sum = 0.0;
 	long int M = 0, i = 0;
-	unsigned short index[3];
 
 	scanf("%Lf", &S);
 	scanf("%Lf", &E);
@@ -58,12 +81,8 @@ int main(void){
 
 	printf("%Lf, %Lf, %Lf, %Lf, %Lf, %ld\n", S, E, r, sigma, T, M);
 
-	index[0] = time(NULL);
-	index[1] = time(NULL);
-	seed48(index);
-
 	for( ;i < M; i++){
-		long double rand = erand48(index);
+		long double rand = gaussrand();
 		long double t = S * exp( ( (r - ((sigma*sigma)/2)) * T ) + (sigma*sqrt(T)*rand) );
 		trials[i] = exp( (-1*r)*T) * max(t-E, 0);
 		sum += trials[i];
@@ -72,7 +91,8 @@ int main(void){
 	long double mean = sum / M;
 	long double confidence_interval = 1.96*(standard_deviation(trials, M, mean)/sqrt(M));
 
-	printf("The confidence interval calculated is [%Lf,%Lf]", mean - confidence_interval, mean + confidence_interval);
+	printf("mean %Lf, ci %Lf\n", mean, confidence_interval);
+	printf("The confidence interval calculated is [%Lf,%Lf]\n", mean - confidence_interval, mean + confidence_interval);
 
 	free(trials);
 
