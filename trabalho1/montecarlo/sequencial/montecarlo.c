@@ -17,25 +17,32 @@
 
 #define MAX_INTERACTION 1E+09
 
-int main(void){
-
-	unsigned long int i = 0, hits = 0;;
-	unsigned short index[3];
+void montecarlo(unsigned long int num_interaction){
+    unsigned long int i = 0, hits = 0;;
 	long double x = 0, y = 0;
 
-	index[0] = time(NULL);
-	index[1] = time(NULL);
-	seed48(index);
-
-	for(; i < MAX_INTERACTION; i++){
-		x = erand48(index);
-		y = erand48(index);
+	for(; i < num_interaction; i++){
+		x = drand48();
+		y = drand48();
 
 		if((x*x)+(y*y) < 1)
 			hits++;
 
 	}
 
-	printf("The generated pi number is %.6lf\n", 4 * (hits/MAX_INTERACTION) );
+	//printf("The generated pi number is %.6lf\n", 4 * (hits/MAX_INTERACTION) );
+}
+
+int main(void){
+	unsigned long int i = 1E+7;
+	time_t ini;
+
+    for(; i <= MAX_INTERACTION; i*=10){
+        srand48(time(NULL));
+   		ini = time(0);
+		montecarlo(i);
+		printf("%d\n",(int)(time(0)-ini));
+	}
+	
 	return EXIT_SUCCESS;
 }
