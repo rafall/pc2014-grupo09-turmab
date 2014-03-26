@@ -5,36 +5,11 @@
 #include <math.h>
 
 #define NUM_THREADS 4
-#define MAX_INTERACTION (1E+06)
-#define NUM_INTERACTION (MAX_INTERACTION/NUM_THREADS)
+#define MAX_INTERACTION (1E+09)
 
 pthread_t callThd[NUM_THREADS];
 long long int *hits;
-
-/*double gaussrand()
-{
-	static double V1, V2, S;
-	static int phase = 0;
-	double X;
-
-	if(phase == 0) {
-		do {
-			double U1 = (double)drand48() / RAND_MAX;
-			double U2 = (double)drand48() / RAND_MAX;
-
-			V1 = 2 * U1 - 1;
-			V2 = 2 * U2 - 1;
-			S = V1 * V1 + V2 * V2;
-			} while(S >= 1 || S == 0);
-
-		X = V1 * sqrt(-2 * log(S) / S);
-	} else
-		X = V2 * sqrt(-2 * log(S) / S);
-
-	phase = 1 - phase;
-
-	return X;
-}*/
+unsigned long int num_interctions_threads;
 
 void *calculate_pi(void *arg) {
     unsigned long int i = 0;
@@ -42,13 +17,10 @@ void *calculate_pi(void *arg) {
     
     offset = (long) arg;
     
-    for (; i < NUM_INTERACTION; i++) {
+    for (; i < num_interctions_threads; i++) {
         long double x = drand48();
         long double y = drand48();
         
-/*        long double x = gaussrand();
-        long double y = gaussrand();
-*/      
         if ((x * x)+(y * y) < 1) {
             hits[offset]++;
         }
@@ -57,14 +29,14 @@ void *calculate_pi(void *arg) {
     pthread_exit((void*) EXIT_SUCCESS);
 }
 
-int main(void) {
+void montecarlo(unsigned long int num_interactions){
     long i;
     void *status=0;
     long long int sum_hits=0;
     hits = (long long int *)malloc(sizeof(long long int)*NUM_THREADS);
 
     srand48(time(NULL));
-
+    num_interctions_threads /= num_interactions;
 
     for (i = 0; i < NUM_THREADS; i++) {
         hits[i] = 0;
@@ -73,13 +45,25 @@ int main(void) {
 
     for (i = 0; i < NUM_THREADS; i++) {
         pthread_join(callThd[i], (void *) status);
-        printf("hits: %lli\n", hits[i]);
         sum_hits += hits[i];
     }
 
-    printf("PI =  %lf \n", sum_hits/NUM_INTERACTION);
+    //printf("PI =  %lf \n", sum_hits/NUM_INTERACTION);
 
     free(hits);
+}
+
+int main(void) {
+    unsigned long int i = 1E+7;
+	time_t ini;
+
+    for(; i <= MAX_INTERACTION; i*=10){
+        srand48(time(NULL));
+   		ini = time(0);
+		montecarlo(i);
+		printf("%d\n",(int)(time(0)-ini));
+	}
+	
     return (EXIT_SUCCESS);
 }
 

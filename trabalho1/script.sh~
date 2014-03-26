@@ -1,0 +1,27 @@
+montecarlo_seq(){
+    make -C montecarlo/sequencial clean 
+    make -C montecarlo/sequencial
+    clear
+    echo "Montecarlo Sequencial\n".
+    ./montecarlo/sequencial/montecarlo
+    clear
+    make -C montecarlo/sequencial clean
+}
+
+montecarlo_par(){
+    make -C montecarlo/paralelo clean 
+    make -C montecarlo/paralelo
+    clear
+    echo "Montecarlo Paralelo\n".
+    ./montecarlo/paralelo/montecarlo
+    clear
+    make -C montecarlo/paralelo clean
+}
+
+main(){
+    clear
+    montecarlo_seq
+    montecarlo_par
+}
+
+main

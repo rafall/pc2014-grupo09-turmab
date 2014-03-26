@@ -9,7 +9,7 @@
 
 CC = gcc #			#The complier (example works for gcc)
 CPP_FLAGS = # 			#Preprocessor flags
-C_FLAGS   = -Wall -Wextra -Werror  #Compiler flags
+C_FLAGS   = -Wall -Wextra #-Werror  #Compiler flags
 LD_FLAGS  = -pthread -lm #			#Linker flags
 
 #

@@ -1,0 +1,26 @@
+montecarlo_seq(){
+    make -C montecarlo/sequencial clean 
+    make -C montecarlo/sequencial
+    for i in $(seq 5); do 
+        #echo "Contando: $i\n".
+        ./montecarlo/sequencial/montecarlo
+    done
+    make -C montecarlo/sequencial clean
+}
+
+montecarlo_par(){
+    make -C montecarlo/paralelo clean 
+    make -C montecarlo/paralelo
+    for i in $(seq 5); do 
+        #echo "Contando: $i\n".
+        ./montecarlo/paralelo/montecarlo
+    done
+    make -C montecarlo/paralelo clean
+}
+
+main(){
+    montecarlo_seq
+    #montecarlo_par
+}
+
+main
