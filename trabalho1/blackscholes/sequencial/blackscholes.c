@@ -61,6 +61,8 @@ long double standard_deviation(long double *data, long int size, long double mea
 		squared_deviation += mean_difference*mean_difference;
 	}
 
+	printf("squared_deviation: %Lf\n", squared_deviation);
+
 	return sqrt(squared_deviation/size);
 }
 

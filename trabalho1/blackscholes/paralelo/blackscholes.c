@@ -30,7 +30,7 @@
 const int A = 1103515245, C = 12345, m = (1<<30);
 pthread_t callThd[NUM_THREADS];
 long int M = 0;
-long double S = 0.0, E = 0.0, r = 0.0, sigma = 0.0, T = 0.0, *trials, *sum;
+long double S = 0.0, E = 0.0, r = 0.0, sigma = 0.0, T = 0.0, mean = 0.0, *trials, *sum, *squared_deviation;
 
 int next(int& x){
 	x = (x*A+C)%m;
@@ -59,21 +59,26 @@ void* blackscholes(void *arg){
 	pthread_exit((void*) EXIT_SUCCESS);
 }
 
+void *standard_deviation(void* arg){
 
-long double standard_deviation(long double *data, long int size, long double mean){
+	long long int offset, size = M/NUM_THREADS;
 
 	if(0 == size)
-		return 0.0;
+		pthread_exit((void*) EXIT_SUCCESS);
 
-	long double mean_difference = 0.0, squared_deviation = 0.0;
-	long int i = 0;
+	offset = (long long int )arg;
 
-	for(; i < size; i++){
-		mean_difference = data[i] - mean;
-		squared_deviation += mean_difference*mean_difference;
+	long double mean_difference = 0.0;
+	unsigned long long int i = 0;
+	unsigned long long int begin = offset*size;
+	unsigned long long int end = (offset+1)*size;
+
+	for(i = begin; i < end; i++){
+		mean_difference = trials[i] - mean;
+		squared_deviation[offset] += mean_difference*mean_difference;
 	}
 
-	return sqrt(squared_deviation/size);
+	pthread_exit((void*) EXIT_SUCCESS);
 }
 
 int main(void){
@@ -87,8 +92,11 @@ int main(void){
 
 	long long int i;
 	long double sum_hits = 0.0;
+	long double std_deviation = 0.0;
+
 	trials = (long double*) malloc(sizeof(long double)*M);
 	sum = (long double*) malloc(sizeof(long double)*NUM_THREADS);
+	squared_deviation = (long double*)malloc(sizeof(long double)*NUM_THREADS);
 
 	printf("%Lf, %Lf, %Lf, %Lf, %Lf, %ld\n", S, E, r, sigma, T, M);
 
@@ -101,13 +109,24 @@ int main(void){
 		sum_hits += sum[i];
 	}
 
-	long double mean = sum_hits / M;
-	long double confidence_interval = 1.96*(standard_deviation(trials, M, mean)/sqrt(M));
+	mean = sum_hits / M;
+
+	for (i = 0; i < NUM_THREADS; i++) {
+		pthread_create(&callThd[i], NULL, standard_deviation, (void *) i);
+	}
+
+	for (i = 0; i < NUM_THREADS; i++) {
+		pthread_join(callThd[i], NULL);
+		std_deviation += squared_deviation[i];
+	}
+
+	long double confidence_interval = 1.96*(sqrt(std_deviation/M)/sqrt(M));
 
 	printf("The confidence interval calculated is [%Lf,%Lf]\n", mean - confidence_interval, mean + confidence_interval);
 
 	free(trials);
 	free(sum);
+	free(squared_deviation);
 
 	return EXIT_SUCCESS;
 }
