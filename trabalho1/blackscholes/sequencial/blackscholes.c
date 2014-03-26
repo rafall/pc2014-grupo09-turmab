@@ -88,6 +88,7 @@ int main(void){
 		sum += trials[i];
 	}
 
+	printf("Sum: %Lf\n", sum);
 	long double mean = sum / M;
 	long double confidence_interval = 1.96*(standard_deviation(trials, M, mean)/sqrt(M));
 
