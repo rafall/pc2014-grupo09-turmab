@@ -30,19 +30,13 @@ void montecarlo(unsigned long int num_interaction){
 
 	}
 
-	//printf("The generated pi number is %.6lf\n", 4 * (hits/MAX_INTERACTION) );
+	printf("%.6lf\n", 4 * (hits/MAX_INTERACTION) );
 }
 
 int main(void){
-	unsigned long int i = 1E+7;
-	time_t ini;
+    srand48(time(NULL));
 
-    for(; i <= MAX_INTERACTION; i*=10){
-        srand48(time(NULL));
-   		ini = time(0);
-		montecarlo(i);
-		printf("%d\n",(int)(time(0)-ini));
-	}
-	
+	montecarlo(MAX_INTERACTION);
+
 	return EXIT_SUCCESS;
 }
