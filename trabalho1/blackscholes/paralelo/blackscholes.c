@@ -17,8 +17,6 @@
 #include <time.h>
 #include <pthread.h>
 
-#define NUM_THREADS 16
-
 #define max(a,b) ({ \
 	typeof(a) _a_temp_; \
 	typeof(b) _b_temp_; \
@@ -28,8 +26,8 @@
 })
 
 const int A = 1103515245, C = 12345, m = (1<<30);
-pthread_t callThd[NUM_THREADS];
-long int M = 0;
+pthread_t *callThd;
+unsigned long int num_threads, M = 0;
 long double S = 0.0, E = 0.0, r = 0.0, sigma = 0.0, T = 0.0, mean = 0.0, *trials, *sum, *squared_deviation;
 
 int next(int& x){
@@ -41,10 +39,10 @@ int next(int& x){
 
 void* blackscholes(void *arg){
 
-	long long int offset, size = M/NUM_THREADS;
+	long long int offset, size = M/num_threads;
 	int x = time(NULL);
 
-	offset = (long long int) arg;
+	offset = (unsigned long int) arg;
 
 	unsigned long long int i = 0;
 	unsigned long long int begin = offset*size;
@@ -61,7 +59,7 @@ void* blackscholes(void *arg){
 
 void *standard_deviation(void* arg){
 
-	long long int offset, size = M/NUM_THREADS;
+	long long int offset, size = M/num_threads;
 
 	if(0 == size)
 		pthread_exit((void*) EXIT_SUCCESS);
@@ -81,7 +79,13 @@ void *standard_deviation(void* arg){
 	pthread_exit((void*) EXIT_SUCCESS);
 }
 
-int main(void){
+int main(int argc, char** argv){
+
+
+	if(argc < 2)
+		num_threads = 4;
+	else
+		num_threads = atoi(argv[1]);
 
 	scanf("%Lf", &S);
 	scanf("%Lf", &E);
@@ -90,43 +94,47 @@ int main(void){
 	scanf("%Lf", &T);
 	scanf("%ld", &M);
 
-	long long int i;
+	unsigned long int i;
 	long double sum_hits = 0.0;
 	long double std_deviation = 0.0;
 
 	trials = (long double*) malloc(sizeof(long double)*M);
-	sum = (long double*) malloc(sizeof(long double)*NUM_THREADS);
-	squared_deviation = (long double*)malloc(sizeof(long double)*NUM_THREADS);
+	sum = (long double*) malloc(sizeof(long double)*num_threads);
+	squared_deviation = (long double*)malloc(sizeof(long double)*num_threads);
+	callThd = (pthread_t *)malloc(sizeof(pthread_t)*num_threads);
 
-	printf("%Lf, %Lf, %Lf, %Lf, %Lf, %ld\n", S, E, r, sigma, T, M);
+/*	printf("%Lf, %Lf, %Lf, %Lf, %Lf, %ld\n", S, E, r, sigma, T, M);*/
 
-	for (i = 0; i < NUM_THREADS; i++) {
+	for (i = 0; i < num_threads; i++) {
 		pthread_create(&callThd[i], NULL, blackscholes, (void *) i);
 	}
 
-	for (i = 0; i < NUM_THREADS; i++) {
+	for (i = 0; i < num_threads; i++) {
 		pthread_join(callThd[i], NULL);
 		sum_hits += sum[i];
 	}
 
 	mean = sum_hits / M;
 
-	for (i = 0; i < NUM_THREADS; i++) {
+	for (i = 0; i < num_threads; i++) {
 		pthread_create(&callThd[i], NULL, standard_deviation, (void *) i);
 	}
 
-	for (i = 0; i < NUM_THREADS; i++) {
+	for (i = 0; i < num_threads; i++) {
 		pthread_join(callThd[i], NULL);
 		std_deviation += squared_deviation[i];
 	}
 
 	long double confidence_interval = 1.96*(sqrt(std_deviation/M)/sqrt(M));
 
-	printf("The confidence interval calculated is [%Lf,%Lf]\n", mean - confidence_interval, mean + confidence_interval);
+/*	printf("The confidence interval calculated is [%Lf,%Lf]\n", mean - confidence_interval, mean + confidence_interval);*/
+
+	printf("%.6Lf\n%.6Lf\n", mean, confidence_interval);
 
 	free(trials);
 	free(sum);
 	free(squared_deviation);
+	free(callThd);
 
 	return EXIT_SUCCESS;
 }
