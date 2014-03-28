@@ -61,7 +61,7 @@ long double standard_deviation(long double *data, long int size, long double mea
 		squared_deviation += mean_difference*mean_difference;
 	}
 
-	printf("squared_deviation: %Lf\n", squared_deviation);
+/*	printf("squared_deviation: %Lf\n", squared_deviation);*/
 
 	return sqrt(squared_deviation/size);
 }
@@ -81,7 +81,7 @@ int main(void){
 
 	trials = (long double*) malloc(sizeof(long double)*M);
 
-	printf("%Lf, %Lf, %Lf, %Lf, %Lf, %ld\n", S, E, r, sigma, T, M);
+/*	printf("%Lf, %Lf, %Lf, %Lf, %Lf, %ld\n", S, E, r, sigma, T, M);*/
 
 	for( ;i < M; i++){
 		long double rand = gaussrand();
@@ -90,12 +90,14 @@ int main(void){
 		sum += trials[i];
 	}
 
-	printf("Sum: %Lf\n", sum);
+/*	printf("Sum: %Lf\n", sum);*/
 	long double mean = sum / M;
 	long double confidence_interval = 1.96*(standard_deviation(trials, M, mean)/sqrt(M));
 
-	printf("mean %Lf, ci %Lf\n", mean, confidence_interval);
-	printf("The confidence interval calculated is [%Lf,%Lf]\n", mean - confidence_interval, mean + confidence_interval);
+/*	printf("mean %Lf, ci %Lf\n", mean, confidence_interval);*/
+/*	printf("The confidence interval calculated is [%Lf,%Lf]\n", mean - confidence_interval, mean + confidence_interval);*/
+
+	printf("%.6Lf\n%.6Lf\n", mean, confidence_interval);
 
 	free(trials);
 
