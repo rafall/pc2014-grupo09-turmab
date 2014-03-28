@@ -32,7 +32,7 @@ montecarlo_par(){
 }
 
 blackscholes_seq(){
-    path="blackscholes/sequencial"
+    path="/blackscholes/sequencial"
     
     make --silent --directory=$path clean 
     make --silent --directory=$path
@@ -47,7 +47,7 @@ blackscholes_seq(){
 }
 
 blackscholes_par(){
-    path="blackscholes/paralelo"
+    path="/blackscholes/paralelo"
     
     make --silent --directory=$path clean 
     make --silent --directory=$path

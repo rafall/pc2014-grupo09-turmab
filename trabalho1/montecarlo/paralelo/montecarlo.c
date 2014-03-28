@@ -4,66 +4,58 @@
 #include <time.h>
 #include <math.h>
 
-#define NUM_THREADS 4
+#define NUM_THREADS 16
 #define MAX_INTERACTION (1E+09)
+#define NUM_INTERACTION (MAX_INTERACTION/NUM_THREADS)
 
+const int A = 1103515245, C = 12345, m = (1<<30);
+const long long T = (long long) m*m;
 pthread_t callThd[NUM_THREADS];
 long long int *hits;
-unsigned long int num_interctions_threads;
 
-void *calculate_pi(void *arg) {
-    unsigned long int i = 0;
-    long offset;
-    
-    offset = (long) arg;
-    
-    for (; i < num_interctions_threads; i++) {
-        long double x = drand48();
-        long double y = drand48();
-        
-        if ((x * x)+(y * y) < 1) {
-            hits[offset]++;
-        }
-    }
-
-    pthread_exit((void*) EXIT_SUCCESS);
+int next(int& x)
+{
+        return x = (x*A+C)%m;
 }
 
-void montecarlo(unsigned long int num_interactions){
-    long i;
-    void *status=0;
-    long long int sum_hits=0;
-    hits = (long long int *)malloc(sizeof(long long int)*NUM_THREADS);
+void *calculate_pi(void *arg) {
 
-    srand48(time(NULL));
-    num_interctions_threads /= num_interactions;
+        unsigned long long int i = 0;
+        long offset;
+        int x = time(NULL);
 
-    for (i = 0; i < NUM_THREADS; i++) {
-        hits[i] = 0;
-        pthread_create(&callThd[i], NULL, calculate_pi, (void *) i);
-    }
+        offset = (long)arg;
 
-    for (i = 0; i < NUM_THREADS; i++) {
-        pthread_join(callThd[i], (void *) status);
-        sum_hits += hits[i];
-    }
+        for (; i < NUM_INTERACTION; i++) {
+                long double a = next(x);
+                long double b = next(x);
 
-    //printf("PI =  %lf \n", sum_hits/NUM_INTERACTION);
+                if ((a * a)+(b * b) <= T) {
+                        hits[offset]++;
+                }
+        }
 
-    free(hits);
+        pthread_exit((void*) EXIT_SUCCESS);
 }
 
 int main(void) {
-    unsigned long int i = 1E+7;
-	time_t ini;
 
-    for(; i <= MAX_INTERACTION; i*=10){
-        srand48(time(NULL));
-   		ini = time(0);
-		montecarlo(i);
-		printf("%d\n",(int)(time(0)-ini));
-	}
-	
-    return (EXIT_SUCCESS);
+        long i;
+        long long int sum_hits=0;
+        hits = (long long int *)malloc(sizeof(long long int)*NUM_THREADS);
+
+        for (i = 0; i < NUM_THREADS; i++) {
+                hits[i] = 0;
+                pthread_create(&callThd[i], NULL, calculate_pi, (void *) i);
+        }
+
+        for (i = 0; i < NUM_THREADS; i++) {
+                pthread_join(callThd[i], NULL);
+                sum_hits += hits[i];
+        }
+
+        printf("%.6lf\n", sum_hits*4/MAX_INTERACTION);
+
+        free(hits);
+        return (EXIT_SUCCESS);
 }
-
