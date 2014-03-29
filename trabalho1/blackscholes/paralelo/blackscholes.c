@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------- */
-/*  Copyright (c) 2013 Fernando Noveletto Candiani, Marcius Leandro  */
-/*  Junior, Rafael Hiroke                                            */
+/*  Copyright (c) 2014 Fernando Noveletto Candiani, Marcius Leandro  */
+/*  Junior, Rafael Hiroki de Figueiroa Minami                        */
 /*                                                                   */
 /*  This program is free software; you can redistribute it and/or    */
 /*  modify it under the terms of the GNU General Public License as   */
@@ -17,7 +17,7 @@
 #include <time.h>
 #include <pthread.h>
 
-#define max(a,b) ({ \
+#define max(a,b) ({ \   /* retorna o maior entre a e b */
 	typeof(a) _a_temp_; \
 	typeof(b) _b_temp_; \
 	_a_temp_ = (a); \
@@ -30,14 +30,14 @@ pthread_t *callThd;
 unsigned long int num_threads, M = 0;
 long double S = 0.0, E = 0.0, r = 0.0, sigma = 0.0, T = 0.0, mean = 0.0, *trials, *sum, *squared_deviation;
 
-int next(int& x){
+int next(int& x){   /* gera um numero aleatorio */
 	x = (x*A+C)%m;
 	if (x < 0)
 		x = (x+m)%m;
 	return x;
 }
 
-void* blackscholes(void *arg){
+void* blackscholes(void *arg){    /* Modelo de Black Scholes atraves da simulacao de Monte Carlo */
 
 	long long int offset, size = M/num_threads;
 	int x = time(NULL);
@@ -57,7 +57,7 @@ void* blackscholes(void *arg){
 	pthread_exit((void*) EXIT_SUCCESS);
 }
 
-void *standard_deviation(void* arg){
+void *standard_deviation(void* arg){    /* calculo do desvio padrao */
 
 	long long int offset, size = M/num_threads;
 
@@ -87,12 +87,12 @@ int main(int argc, char** argv){
 	else
 		num_threads = atoi(argv[1]);
 
-	scanf("%Lf", &S);
-	scanf("%Lf", &E);
-	scanf("%Lf", &r);
-	scanf("%Lf", &sigma);
-	scanf("%Lf", &T);
-	scanf("%ld", &M);
+	scanf("%Lf", &S);       /*valor da acao  */
+	scanf("%Lf", &E);       /* preco de exercicio da opcao */
+	scanf("%Lf", &r);       /* taxa de juros livre de risco */
+	scanf("%Lf", &sigma);   /* volatilidade da acao */
+	scanf("%Lf", &T);       /* tempo de validade da opcao */
+	scanf("%ld", &M);       /* numero de iteracoes */
 
 	unsigned long int i;
 	long double sum_hits = 0.0;
@@ -105,23 +105,23 @@ int main(int argc, char** argv){
 
 /*	printf("%Lf, %Lf, %Lf, %Lf, %Lf, %ld\n", S, E, r, sigma, T, M);*/
 
-	for (i = 0; i < num_threads; i++) {
+	for (i = 0; i < num_threads; i++) {     /* cria as threads para a funcao blackscholes */
 		pthread_create(&callThd[i], NULL, blackscholes, (void *) i);
 	}
 
 	for (i = 0; i < num_threads; i++) {
-		pthread_join(callThd[i], NULL);
+                pthread_join(callThd[i], NULL);     /* as threads devem terminar juntas */
 		sum_hits += sum[i];
 	}
 
 	mean = sum_hits / M;
 
-	for (i = 0; i < num_threads; i++) {
+	for (i = 0; i < num_threads; i++) {     /* cria as threads para a funcao standard_deviation */
 		pthread_create(&callThd[i], NULL, standard_deviation, (void *) i);
 	}
 
 	for (i = 0; i < num_threads; i++) {
-		pthread_join(callThd[i], NULL);
+		pthread_join(callThd[i], NULL);     /* as threads devem terminar juntas */
 		std_deviation += squared_deviation[i];
 	}
 

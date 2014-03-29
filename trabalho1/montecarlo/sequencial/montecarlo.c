@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------- */
-/*  Copyright (c) 2013 Fernando Noveletto Candiani, Marcius Leandro  */
-/*  Junior, Rafael Hiroke                                            */
+/*  Copyright (c) 2014 Fernando Noveletto Candiani, Marcius Leandro  */
+/*  Junior, Rafael Hiroki de Figueiroa Minami                        */
 /*                                                                   */
 /*  This program is free software; you can redistribute it and/or    */
 /*  modify it under the terms of the GNU General Public License as   */
@@ -22,10 +22,10 @@ void montecarlo(unsigned long int num_interaction){
 	long double x = 0, y = 0;
 
 	for(; i < num_interaction; i++){
-		x = drand48();
-		y = drand48();
+		x = drand48();       /*gera um valor aleatorio para x*/
+		y = drand48();       /*gera um valor aleatorio para y*/
 
-		if((x*x)+(y*y) < 1)
+		if((x*x)+(y*y) < 1) /*verifica se o ponto aleatorio gerado esta dentro da circunferencia*/
 			hits++;
 
 	}
@@ -34,9 +34,9 @@ void montecarlo(unsigned long int num_interaction){
 }
 
 int main(void){
-    srand48(time(NULL));
+    srand48(time(NULL));  //semente para gerar os numeros aleatorios
 
-	montecarlo(MAX_INTERACTION);
+	montecarlo(MAX_INTERACTION); /*funcao que encontra o valor de pi utilizando o metodo de monte carlo*/
 
 	return EXIT_SUCCESS;
 }
