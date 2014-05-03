@@ -9,12 +9,15 @@
 
 CC = mpicc #			#The complier (example works for gcc)
 CPP_FLAGS = # 			#Preprocessor flags
-C_FLAGS   = -Wall -Wextra   #Compiler flags
+C_FLAGS   = -Wall -Wextra -Werror  #Compiler flags
 LD_FLAGS  = #-pthread -lm #			#Linker flags
 
-RUN = mpirun
-HOSTS = hosts
-NP = 2 
+RUN = mpirun #program to execute
+HOSTS = #the hosts file that includes all the nodes available in the cluster
+NP = #number of 
+
+FILE = 
+TEST = #< $(FILE)
 
 PC = ~/Dropbox/University/USP/7Semestre/Concorrentes/pc2014-grupo09-turmab/
 SERVER = ~/grupo-09b/
@@ -26,8 +29,8 @@ CLUSTER = grupo-09b@cluster.lasdpc.icmc.usp.br:
 # The variables you shall change
 #
 
-binary = mpi_mat			   #The executable program to be build
-objects = mpi_mat.o #List of objects that will be linked
+binary = icmctown			   #The executable program to be build
+objects = icmctown.o #List of objects that will be linked
 
 garbage = \#* *~		   # Garbage to clean up, e.g. temp files
 
@@ -70,7 +73,7 @@ include $(makefiles)
 # The rule to build the binary
 
 $(binary) : $(objects)
-	$(CC)   $(objects) -o $@ $(LD_FLAGS) 
+	@$(CC)   $(objects) -o $@ $(LD_FLAGS) 
 
 # Clean up the mess: objects, makefiles, binary and garbage
 # It's a PHONY tag so make does not even check for a file named 'clean'
@@ -78,17 +81,17 @@ $(binary) : $(objects)
 # in the pathological case there is a file named 'clean' in the directory.
 
 run : all
-	$(RUN) --hostfile $(HOSTS) -np $(NP) $(binary) < test.in
+	@$(RUN)$(binary) $(HOSTS) $(NP) $(TEST)
 
 phony : clean push pull
 .PHONY : phony
 
 clean: 
-	rm -f *.o *.d *~ $(binary) $(garbage)
+	@rm -f *.o *.d *~ $(binary) $(garbage)
 
- push : clean
-	scp -r -P 22200 $(PC)$(FOLDER) $(CLUSTER)$(SERVER)
+push : clean
+	@scp -r -P 22200 $(PC)$(FOLDER) $(CLUSTER)$(SERVER)
 
 pull :
-	scp -r -P 22200 $(CLUSTER)$(SERVER)$(FOLDER) $(PC)
+	@scp -r -P 22200 $(CLUSTER)$(SERVER)$(FOLDER) $(PC)
 
