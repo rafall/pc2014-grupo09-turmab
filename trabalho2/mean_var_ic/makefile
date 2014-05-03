@@ -7,27 +7,17 @@
 # at the command line.  Since we then use *_FLAG before *FLAG, the user
 # can eventually overwirte our flags with his own flags.
 
-CC = mpicc #			#The complier (example works for gcc)
+CC = gcc #			#The complier (example works for gcc)
 CPP_FLAGS = # 			#Preprocessor flags
-C_FLAGS   = -Wall -Wextra   #Compiler flags
-LD_FLAGS  = #-pthread -lm #			#Linker flags
-
-RUN = mpirun
-HOSTS = hosts
-NP = 2 
-
-PC = ~/Dropbox/University/USP/7Semestre/Concorrentes/pc2014-grupo09-turmab/
-SERVER = ~/grupo-09b/
-FOLDER = mpi_activity/
-SCOPY = scp -r -P 22200
-CLUSTER = grupo-09b@cluster.lasdpc.icmc.usp.br:
+C_FLAGS   = -Wall -Wextra -Werror  #Compiler flags
+LD_FLAGS  = -lm #			#Linker flags
 
 #
 # The variables you shall change
 #
 
-binary = mpi_mat			   #The executable program to be build
-objects = mpi_mat.o #List of objects that will be linked
+binary = mean_var			   #The executable program to be build
+objects = mean_var.o #List of objects that will be linked
 
 garbage = \#* *~		   # Garbage to clean up, e.g. temp files
 
@@ -40,7 +30,7 @@ all : $(binary)
 # Pattern rule to build objects from sources
 
 %.o : %.c
-	@$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
+	$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
 
 # For each file.o in $(object) we want to add a line in the form
 # 'file.o: header1.h header2.h ... headerN.h'
@@ -53,7 +43,7 @@ all : $(binary)
 # and we get a line in the form 'file.o file.d : file.c header1.h ... headerM`
 # Exactly what we need.
 
-@makefiles = $(objects:.o=.d) 	# auxiliary makefiles, one for each object
+makefiles = $(objects:.o=.d) 	# auxiliary makefiles, one for each object
 
 # Pattern rule for makefiles using gcc -MM -MT flag
 # anything.c will depend on anything.d, $< stands for the first pre-requisite
@@ -61,7 +51,7 @@ all : $(binary)
 # the substring 'token' replaced with 'other'.
 
 %.d: %.c
-	@$(CC) -MM -MT '$(<:.c=.o) $@' $(CPPFLAGS) $< > $@
+	$(CC) -MM -MT '$(<:.c=.o) $@' $(CPPFLAGS) $< > $@
 
 # Including the object's dependencies on headers
 
@@ -77,18 +67,6 @@ $(binary) : $(objects)
 # It not only avoid unecessary file system access but it's also robust
 # in the pathological case there is a file named 'clean' in the directory.
 
-run : all
-	$(RUN) --hostfile $(HOSTS) -np $(NP) $(binary) < test.in
-
-phony : clean push pull
-.PHONY : phony
-
-clean: 
+.PHONY clean:
 	rm -f *.o *.d *~ $(binary) $(garbage)
-
- push : clean
-	scp -r -P 22200 $(PC)$(FOLDER) $(CLUSTER)$(SERVER)
-
-pull :
-	scp -r -P 22200 $(CLUSTER)$(SERVER)$(FOLDER) $(PC)
 
