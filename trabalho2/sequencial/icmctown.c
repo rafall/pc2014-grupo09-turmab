@@ -380,10 +380,10 @@ int main(void){
 
 	for(i = 0; i < g.vertices_size; i++){
 		results[i] = dijkstra(&g,i);
-		for(j = 0; j < g.vertices_size; j++){
-			printf("%u\t", results[i][j]);
-		}
-		printf("\n");
+/*		for(j = 0; j < g.vertices_size; j++){*/
+/*			printf("%u\t", results[i][j]);*/
+/*		}*/
+/*		printf("\n");*/
 	}
 
 	printf("%.6f\n", best_vertex(results, n));
