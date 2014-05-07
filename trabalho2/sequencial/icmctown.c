@@ -19,20 +19,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*Show debug messages*/
 #define _DEBUG_ 0
 
+/*Variables used to generate errors*/
 #define _FAILURE_ 0
 #define _SUCCESS_ 1
 #define _MEM_ERR_ 2
 
+/*Variables used to control the 'stack' of visited vertex*/
 #define _EMPTY_ 0
 #define _NOT_EMPTY_ 1
 
+/*Variables used to control the viseted/unvisited vertex of the graph*/
 #define _VISITED_ 1
 #define _NOT_VISITED_ 2
 
-#define _INF_ 999999999
-/*if(_DEBUG_) printf("\n");*/
+/*Variable used as infinity for the dijkstra algorithm*/
+#define _INF_ 1999999999
 
 typedef struct vertex vertex;
 
@@ -365,9 +369,9 @@ int main(void){
 	graph g;
 	init_graph(&g);
 
+	/*Start reading the data from the stdin*/
 	scanf("%u%u",&n,&m);
 	if(_DEBUG_) printf("%u\t%u\n",n,m);
-	unsigned int *results[n];
 
 	create_vertices(&g, n);
 
@@ -378,12 +382,16 @@ int main(void){
 		create_edge(&g, orig-1, dest-1, weight);
 	}
 
+	/*Compute the dijkstra algorithm for all the vertex in the graph*/
+	unsigned int *results[n];
 	for(i = 0; i < g.vertices_size; i++){
 		results[i] = dijkstra(&g,i);
-/*		for(j = 0; j < g.vertices_size; j++){*/
-/*			printf("%u\t", results[i][j]);*/
-/*		}*/
-/*		printf("\n");*/
+		if(_DEBUG_){
+			for(j = 0; j < g.vertices_size; j++){
+				printf("%u\t", results[i][j]);
+			}
+			printf("\n");
+		}
 	}
 
 	printf("%.6f\n", best_vertex(results, n));
