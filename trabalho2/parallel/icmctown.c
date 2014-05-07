@@ -393,7 +393,7 @@ int main(int argc, char *argv[]){
 		scanf("%u%u",&n,&m);
 		if(_DEBUG_) printf("%u\t%u\n",n,m);
 
-		unsigned int *orig, *dest, *weight;
+		unsigned int *orig, *dest, *weight, j;
 		orig = (unsigned int *) malloc(sizeof(unsigned int)*m);
 		dest = (unsigned int *) malloc(sizeof(unsigned int)*m);
 		weight = (unsigned int *) malloc(sizeof(unsigned int)*m);
@@ -454,6 +454,7 @@ int main(int argc, char *argv[]){
 /*		if(_DEBUG_) printf("Data sent\n");*/
 
 		unsigned int *results[n];
+/*		unsigned int **results = (unsigned int**) malloc(sizeof(unsigned int)*n);*/
 		if(_DEBUG_) printf("Starting receiving the data from nodes\n");
 		/*Receive the data of the computed*/
 		for(i = 1; i <= nworker; i++){
@@ -469,14 +470,34 @@ int main(int argc, char *argv[]){
 
 			printf("data received in the master %u\t%u\n", start_vertex, nvertex);
 
-			for(i = 0; i < (int) nvertex; i++){
-				printf("data received %u\n",i);
-				er = MPI_Recv(results[i+start_vertex], n, MPI_UNSIGNED, i, FROM_WORKER, MPI_COMM_WORLD, &status);
+			unsigned int z;
+			for(z = 0; z < nvertex; z++){
+				printf("%p\t",&results[z]);
+			}
+			printf("\n");
+
+			for(z = 0; z < nvertex; z++){
+				printf("%p\t",results[z]);
+			}
+			printf("\n");
+
+			printf("Num of vertex %u, start_vertex %u\n", nvertex, start_vertex);
+			for(j = 0; j < nvertex; j++){
+				printf("start to receiving data %u\t\t", j+start_vertex);
+				er = MPI_Recv(results[j+start_vertex], n, MPI_UNSIGNED, i, FROM_WORKER, MPI_COMM_WORLD, &status);
 				if(MPI_SUCCESS != er){
 					printf("Failure sending the end vertex for the %u worker.\n", destination);
 				}
+
+				for(z = 0; z < n; z++)
+					printf("%u\t",results[j][z]);
+				printf("ended\n");
 			}
 
+		}
+
+		for(i = 0; i < (int) n; i++){
+			free(results[i]);
 		}
 	}
 	/*End of the master*/
@@ -550,7 +571,7 @@ int main(int argc, char *argv[]){
 		for(i = 0; i < (int) nvertex; i++){
 			results[i] = dijkstra(&g,i+start_vertex);
 			if(_DEBUG_){
-				for(j = 0; j < nvertex; j++){
+				for(j = 0; j < n; j++){
 					printf("%u\t", results[i][j]);
 				}
 				printf("\n");
@@ -568,13 +589,20 @@ int main(int argc, char *argv[]){
 		}
 
 		for(i = 0; i < (int) nvertex; i++){
-			printf("sendind data %u\n",i);
+
+/*			er = MPI_Send(&nvertex, 1, MPI_UNSIGNED, MASTER, FROM_WORKER, MPI_COMM_WORLD);*/
 			er = MPI_Send(results[i], n, MPI_UNSIGNED, MASTER, FROM_WORKER, MPI_COMM_WORLD);
 			if(MPI_SUCCESS != er){
 				printf("Failure sending the end vertex for the %u worker.\n", destination);
 			}
+			printf("sendind data %u\n",i);
+
+		}
+
+		for(i = 0; i < (int) nvertex; i++){
 			free(results[i]);
 		}
+
 		free_all(&g);
 	}
 	/*End of slaves*/
