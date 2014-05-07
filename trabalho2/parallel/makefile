@@ -9,14 +9,14 @@
 
 CC = mpicc #			#The complier (example works for gcc)
 CPP_FLAGS = # 			#Preprocessor flags
-C_FLAGS   = -Wall -Wextra -Werror  #Compiler flags
+C_FLAGS   = -Wall -Wextra #-Werror  #Compiler flags
 LD_FLAGS  = #-pthread -lm #			#Linker flags
 
 RUN = mpirun #program to execute
 HOSTS = --hostfile hosts#the hosts file that includes all the nodes available in the cluster
-NP = -np 2#number of process
+NP = -np 10#number of process
 
-FILE = input2.txt
+FILE = input1.txt
 TEST = < $(FILE)
 
 PC = ~/Dropbox/University/USP/7Semestre/Concorrentes/pc2014-grupo09-turmab/
