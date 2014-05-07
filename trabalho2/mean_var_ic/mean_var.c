@@ -27,14 +27,14 @@ double variance(double *values, double mean, unsigned int size){
 	return -1;
 }
 
-double confidence_interval(double *values, ){
+double confidence_interval(double stddev, unsigned int M){
+	return (stddev*1.96)/sqrt(M);
 }
 
 int main(void){
 	unsigned long int n = 0, n_var = 0;
 	unsigned int i = 0, j =0;
 	double **data;
-/*	float mediaCalculada;*/
 
 	scanf("%lu %lu",&n, &n_var);
 
@@ -58,7 +58,8 @@ int main(void){
 	for(i = 0; i < n_var; i++){
 		double dmean = mean(data[i],n);
 		double var = variance(data[i], dmean, n);
-		printf("%lf\t%lf\n", dmean, var);
+		double conf_width = confidence_interval(var, n);
+		printf("%lf\t%lf\t\t%lf\t%lf\n", dmean, var, dmean-conf_width, dmean+conf_width);
 	}
 
 	for(i = 0; i < n_var; i++)

@@ -71,6 +71,7 @@ struct graph{
 
 /*Initializes the graph g with the initial values*/
 void init_graph(graph *g){
+
 	if(_DEBUG_) printf("Initializing a graph\n");
 	if(NULL != g){
 		g->vertices_size = 0;
@@ -85,6 +86,7 @@ void init_graph(graph *g){
 
 /*Initializes the edge e with the initial values*/
 void init_edge(edge *e, unsigned int id, unsigned weight){
+
 	if(_DEBUG_) printf("Initializing an edge with id %u and weight %u\n", id, weight);
 	if(NULL != e){
 		e->weight = weight;
@@ -99,6 +101,7 @@ void init_edge(edge *e, unsigned int id, unsigned weight){
 
 /*Initializes the vertex v with the initial values*/
 void init_vertex(vertex *v, unsigned int id){
+
 	if(_DEBUG_) printf("Initializing a vertex with id %u\n", id);
 	if(NULL != v){
 		v->adjacents_size = 0;
@@ -112,6 +115,7 @@ void init_vertex(vertex *v, unsigned int id){
 
 /*Allocates a new edge and initialize it with an id and a weight*/
 edge* alloc_edge(unsigned int id, unsigned int weight){
+
 	if(_DEBUG_) printf("Allocating a new edge with id %u and weight %u\n", id, weight);
 	edge *e = (edge*)malloc(sizeof(edge));
 	if(NULL != e){
@@ -138,6 +142,7 @@ vertex* alloc_vertex(unsigned int id){
 
 /*Add a edge to a vertex, i.e. allocates a new edge to the list of adjacents of a vertex*/
 int add_edge_vertex(graph *g, unsigned int id, edge *e){
+
 	if(_DEBUG_) printf("Adding an edge (%u)to vertex (%u)\n", e->edge_id, id);
 	if(NULL != e){
 		if(NULL == g->vertices[id]){
@@ -162,6 +167,7 @@ int add_edge_vertex(graph *g, unsigned int id, edge *e){
 
 /*Creates an edge in the graph g from the vertex origin to vertex destination with a weight weight.*/
 int create_edge(graph *g, unsigned int origin, unsigned int destination, unsigned int weight){
+
 	if(_DEBUG_) printf("Creating an edge from %u to %u with weight %u\n", origin, destination, weight);
 	if(NULL != g){
 		g->edges = (edge **)realloc(g->edges,(g->edges_size+1)*sizeof(edge));
@@ -242,12 +248,14 @@ void free_vertex(vertex *v){
 void free_all(graph *g){
 
 	unsigned int i;
+
+	/*Free all the vertices*/
 	for(i = 0; i < g->vertices_size; i++){
 		free_vertex(g->vertices[i]);
 	}
 	free(g->vertices);
 
-
+	/*Free all the edges*/
 	for(i = 0; i < g->edges_size; i++){
 		free(g->edges[i]);
 	}
@@ -341,23 +349,28 @@ unsigned int *dijkstra(graph *g, unsigned int source){
 	return values;
 }
 
-float best_vertex(unsigned int **M, unsigned int n){
-	unsigned int max, shortest = _INF_, i, j, vertex;
+/*Search the max value inside the vector v*/
+unsigned int search_max(unsigned int *v, unsigned int size){
 
-	for (i = 0; i < n; i++){
-		max = 0;
-		for (j = 0; j < n; ++j){
-			if(M[i][j] > max)
-				max = M[i][j];
-		}
-		if(max < shortest){
-			shortest = max;
-			vertex = i;
+	unsigned int i, max = 0;
+	for(i = 0; i < size; i++){
+		if(v[i] > max){
+			max = v[i];
 		}
 	}
+	return max;
+}
 
-	printf("%d\n",vertex+1);
-	return (float) shortest;
+/*Search the min value inside the vector v*/
+unsigned int search_min(unsigned int *v, unsigned int size){
+
+	unsigned int i, min = _INF_;
+	for(i = 0; i < size; i++){
+		if(min > v[i]){
+			min = v[i];
+		}
+	}
+	return min;
 }
 
 int main(int argc, char *argv[]){
@@ -453,10 +466,7 @@ int main(int argc, char *argv[]){
 		free(weight);
 		if(_DEBUG_) printf("All Data sent to al the workers.\n");
 
-		unsigned int **results = (unsigned int**) malloc(sizeof(unsigned int *)*n);
-		for (i = 0; i < (int) n; i++){
-			results[i] = (unsigned int *) malloc(sizeof(unsigned int)*n);
-		}
+		unsigned int *results = (unsigned int*) malloc(sizeof(unsigned int)*n);
 
 		if(_DEBUG_) printf("Starting receiving the data from nodes.\n");
 		/*Receive the data*/
@@ -474,29 +484,21 @@ int main(int argc, char *argv[]){
 
 			for(j = 0; j < nvertex; j++){
 
-				er = MPI_Recv(results[j+start_vertex], n, MPI_UNSIGNED, i, FROM_WORKER, MPI_COMM_WORLD, &status);
+				er = MPI_Recv(&results[j+start_vertex], 1, MPI_UNSIGNED, i, FROM_WORKER, MPI_COMM_WORLD, &status);
 				if(MPI_SUCCESS != er){
 					printf("Failure receiving the results vector for the %u worker.\n", destination);
 				}
 
-				if(_DEBUG_){
-					unsigned int z;
-					for(z = 0; z < n; z++)
-						printf("%u\t",results[j][z]);
-					printf("\n");
-				}
+				if(_DEBUG_) printf("%u\n",results[j+start_vertex]);
 			}
 
 			if(_DEBUG_) printf("All data received from worker %u\n",i);
 		}
 
-		printf("%.6f\n", best_vertex(results, n));
+		printf("%u\n", search_min(results, n));
 
 		if(_DEBUG_) printf("All data received from workers\n");
 
-		for(i = 0; i < (int) n; i++){
-			free(results[i]);
-		}
 		free(results);
 	}
 	/****************************End of the master***************************************/
@@ -594,7 +596,8 @@ int main(int argc, char *argv[]){
 
 		for(i = 0; i < (int) nvertex; i++){
 
-			er = MPI_Send(results[i], n, MPI_UNSIGNED, MASTER, FROM_WORKER, MPI_COMM_WORLD);
+			unsigned int v = search_max(results[i], n);
+			er = MPI_Send(&v, 1, MPI_UNSIGNED, MASTER, FROM_WORKER, MPI_COMM_WORLD);
 			if(MPI_SUCCESS != er){
 				printf("Failure sending the result vector for the master from worker %d.\n", task);
 			}
