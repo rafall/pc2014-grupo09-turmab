@@ -104,11 +104,11 @@ main(){
 	echo "Executing the script."
 
 	echo "Executing the sequential algorithm."
-#		seq_alg
+		seq_alg
 	echo "Execution of the sequential algorithm ended."
 
 	echo "Calculating statistics for the sequential algorithm."
-#		seq_mean
+		seq_mean
 	echo "Calculation of the statistics for the sequential algorithm done."
 
 	echo "Executing the parallel algorithm."
