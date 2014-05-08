@@ -30,7 +30,7 @@ all : $(binary)
 # Pattern rule to build objects from sources
 
 %.o : %.c
-	$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
+	@$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
 
 # For each file.o in $(object) we want to add a line in the form
 # 'file.o: header1.h header2.h ... headerN.h'
@@ -43,7 +43,7 @@ all : $(binary)
 # and we get a line in the form 'file.o file.d : file.c header1.h ... headerM`
 # Exactly what we need.
 
-makefiles = $(objects:.o=.d) 	# auxiliary makefiles, one for each object
+@makefiles = $(objects:.o=.d) 	# auxiliary makefiles, one for each object
 
 # Pattern rule for makefiles using gcc -MM -MT flag
 # anything.c will depend on anything.d, $< stands for the first pre-requisite
@@ -51,7 +51,7 @@ makefiles = $(objects:.o=.d) 	# auxiliary makefiles, one for each object
 # the substring 'token' replaced with 'other'.
 
 %.d: %.c
-	$(CC) -MM -MT '$(<:.c=.o) $@' $(CPPFLAGS) $< > $@
+	@$(CC) -MM -MT '$(<:.c=.o) $@' $(CPPFLAGS) $< > $@
 
 # Including the object's dependencies on headers
 
@@ -60,7 +60,7 @@ include $(makefiles)
 # The rule to build the binary
 
 $(binary) : $(objects)
-	$(CC)   $(objects) -o $@ $(LD_FLAGS) 
+	@$(CC)   $(objects) -o $@ $(LD_FLAGS) 
 
 # Clean up the mess: objects, makefiles, binary and garbage
 # It's a PHONY tag so make does not even check for a file named 'clean'
@@ -68,5 +68,5 @@ $(binary) : $(objects)
 # in the pathological case there is a file named 'clean' in the directory.
 
 .PHONY clean:
-	rm -f *.o *.d *~ $(binary) $(garbage)
+	@rm -f *.o *.d *~ $(binary) $(garbage)
 

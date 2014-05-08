@@ -14,7 +14,8 @@ LD_FLAGS  = #-pthread -lm #			#Linker flags
 
 RUN = mpirun #program to execute
 HOSTS = --hostfile hosts#the hosts file that includes all the nodes available in the cluster
-NP = -np 2#number of process
+CNP = 2#number of process
+NP = -np $(CNP)
 
 FILE = input1.txt
 TEST = < $(FILE)
@@ -80,8 +81,8 @@ $(binary) : $(objects)
 # It not only avoid unecessary file system access but it's also robust
 # in the pathological case there is a file named 'clean' in the directory.
 
-run : all
-	@$(RUN) $(HOSTS) $(NP) $(binary) $(TEST) 
+run :
+	$(RUN) $(HOSTS) $(NP) $(binary) $(TEST)
 
 phony : clean push pull
 .PHONY : phony
