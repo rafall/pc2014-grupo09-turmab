@@ -345,7 +345,7 @@ unsigned int *dijkstra(graph *g, unsigned int source){
 }
 
 float best_vertex(unsigned int **M, unsigned int n){
-	unsigned int max, shortest = _INF_, i, j, vertex;
+	unsigned int max, shortest = _INF_, i, j;//, vertex;
 
 	for (i = 0; i < n; i++){
 		max = 0;
@@ -355,11 +355,11 @@ float best_vertex(unsigned int **M, unsigned int n){
 		}
 		if(max < shortest){
 			shortest = max;
-			vertex = i;
+/*			vertex = i;*/
 		}
 	}
 
-	printf("%d\n",vertex+1);
+/*	printf("%d\n",vertex+1);*/
 	return (float) shortest;
 }
 
