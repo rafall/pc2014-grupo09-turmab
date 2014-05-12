@@ -21,8 +21,8 @@ FILE = input1.txt
 TEST = < $(FILE)
 
 PC = ~/Dropbox/University/USP/7Semestre/Concorrentes/pc2014-grupo09-turmab/
-SERVER = ~/grupo-09b/trabalho2/
-FOLDER = trabalho2/parallel/
+SERVER = ~/grupo-09b/
+FOLDER = trabalho2
 SCOPY = scp -r -P 22200
 CLUSTER = grupo-09b@cluster.lasdpc.icmc.usp.br:
 
@@ -81,7 +81,7 @@ $(binary) : $(objects)
 # It not only avoid unecessary file system access but it's also robust
 # in the pathological case there is a file named 'clean' in the directory.
 
-run :
+run : all
 	$(RUN) $(HOSTS) $(NP) $(binary) $(TEST)
 
 phony : clean push pull

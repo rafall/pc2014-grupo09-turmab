@@ -2,7 +2,7 @@
 
 size="20"
 file="out"
-nodes="2 4 8 12 19"
+nodes="2 4 8 12 16"
 tests=("input1" "input2" "input3")
 
 seq_alg(){
@@ -59,13 +59,11 @@ par_alg(){
 
 	echo -e "\t $path algorithm running."
 
-	size="1"
-
 	for j in "${tests[@]}"; do
 		for i in $nodes; do
 			echo "$size 2" > $path/$j-$i$file
 			for z in $(seq $size); do
-				/usr/bin/time -f "%e" make run FILE=$j CNP=$i >> $path/$j-$i$file 2>&1
+				/usr/bin/time -f "%e" make run --silent --directory=$path FILE=$j CNP=$i >> $path/$j-$i$file 2>&1
 			done
 		done
 	done
