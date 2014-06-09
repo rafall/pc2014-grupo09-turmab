@@ -25,7 +25,7 @@
 #define _MEM_ERR_ 2
 
 /*Default filter size*/
-#define _FILT_SIZE 3
+#define _FILT_SIZE_ 3
 
 /*shorter string for the unsigned short int type.*/
 #define usint unsigned short int
@@ -105,23 +105,30 @@ void localfilt(image *in, image *out, usint rows, usint cols, usint filt_size){
 int main(int argc, char** argv){
 
 	usint i = 0, j = 0, rows = 0, cols = 0, filt_size = 0, max_val = 0;
+	char format[3], img_name[500], hash[2];
 	image *in = NULL, *out = NULL;
 
 	/*Read from the parameters if they changed the filter size, if  */
 	/*not use the default value of 5.                               */
 	if(2 > argc){
 		if(_DEBUG_) printf("No filter size provided, using default.\n");
-		filt_size = _FILT_SIZE;
+		filt_size = _FILT_SIZE_;
 	}else{
 		filt_size = (usint) atoi(argv[1]);
 	}
 
 	/*Start reading the data from the stdin*/
+	scanf("%s", format);
+	if(_DEBUG_) printf("%s\n", format);
+
+	scanf("%s%s", hash, img_name);
+	if(_DEBUG_) printf("%s\n", img_name);
+
 	scanf("%hu%hu",&cols,&rows);
-	if(_DEBUG_) printf("%hu %hu \t",cols,rows);
+	if(_DEBUG_) printf("%hu %hu\n",cols,rows);
 
 	scanf("%hu", &max_val);
-	if(_DEBUG_) printf(" %hu\n", max_val);
+	if(_DEBUG_) printf("%hu\n", max_val);
 
 	in = (image *) malloc(sizeof(image));
 	allocate_img(in, cols+filt_size-1, rows+filt_size-1);
@@ -173,10 +180,11 @@ int main(int argc, char** argv){
 	localfilt(in, out, rows, cols, filt_size);
 
 	/*print the image as ppm to the stdout*/
+	printf("%s\n%s %s\n",format, hash, img_name);
 	printf("%hu %hu\n%hu\n", cols, rows, max_val);
 	for( i = 0; i < rows; i++){
 		for(j=0;j< cols-1; j++){
-			printf("%hu %hu %hu\t", out->r[j][i],out->g[j][i],out->b[j][i]);
+			printf("%hu %hu %hu   ", out->r[j][i],out->g[j][i],out->b[j][i]);
 		}
 		printf("%hu %hu %hu", out->r[j][i],out->g[j][i],out->b[j][i]);
 		printf("\n");
