@@ -117,51 +117,15 @@ int main(int argc, char** argv){
 		filt_size = (usint) atoi(argv[1]);
 	}
 
-	/*Start reading the data from the stdin*/
-	scanf("%s", format);
-	if(_DEBUG_) printf("%s\n", format);
+	/*Start reading the image as ppm from the stdin*/
+	scanf("%s%s%s", format, hash, img_name);
+	if(_DEBUG_) printf("%s\n%s %s\n", format, hash, img_name);
 
-	scanf("%s%s", hash, img_name);
-	if(_DEBUG_) printf("%s\n", img_name);
-
-	scanf("%hu%hu",&cols,&rows);
-	if(_DEBUG_) printf("%hu %hu\n",cols,rows);
-
-	scanf("%hu", &max_val);
-	if(_DEBUG_) printf("%hu\n", max_val);
+	scanf("%hu%hu%hu",&cols,&rows,&max_val);
+	if(_DEBUG_) printf("%hu %hu\n%hu\n",cols,rows, max_val);
 
 	in = (image *) malloc(sizeof(image));
 	allocate_img(in, cols+filt_size-1, rows+filt_size-1);
-
-	/*makes the border for all the colors (rgb).*/
-
-	/*left and right border.*/
-/*	for(i = 0; i < rows+filt_size-1; i++){*/
-/*		for(j = 0; j < filt_size/2; j++){*/
-			/*left border.*/
-/*			in->r[j][i] = 0;*/
-/*			in->g[j][i] = 0;*/
-/*			in->b[j][i] = 0;*/
-			/*right border.*/
-/*			in->r[cols+filt_size-j-2][i] = 0;*/
-/*			in->g[cols+filt_size-j-2][i] = 0;*/
-/*			in->b[cols+filt_size-j-2][i] = 0;*/
-/*		}*/
-/*	}*/
-
-	/*Top and bottom border.*/
-/*	for(i = filt_size/2; i < cols+(filt_size/2);i++){*/
-/*		for(j = 0; j < filt_size/2; j++){*/
-			/*top border.*/
-/*			in->r[i][j] = 0;*/
-/*			in->g[i][j] = 0;*/
-/*			in->b[i][j] = 0;*/
-			/*bottom border.*/
-/*			in->r[i][rows+filt_size-j-2] = 0;*/
-/*			in->g[i][rows+filt_size-j-2] = 0;*/
-/*			in->b[i][rows+filt_size-j-2] = 0;*/
-/*		}*/
-/*	}*/
 
 	/*Read the matrix from the stdin.*/
 	for(i = 0; i < rows; i++){
@@ -177,7 +141,18 @@ int main(int argc, char** argv){
 
 	out = (image *) malloc(sizeof(image));
 	allocate_img(out, cols, rows);
-	localfilt(in, out, rows, cols, filt_size);
+
+	//1 - copiar as matrizes para a GPU (nao esquecer de alocar memoria na GPU)
+	//2 - mais as flags necessarias (numero de threads, blocks, vao ser 3 grids (RGB))
+	//3 - copiar para a shared memory a parte da matriz q vai (syncthreads)
+	//usar pra fazer o calculo (isso eh na funcao que vai ser executada na gpu)
+	//4 - inicializar 3 kernels (funcoes q vao ser executada na GPU) um para cada
+	// espectro de cor (RGB) - isso eh assincrono
+	//5 - Pesquisar com vai esperar o resultado dos kernels para poder salvar a imagem
+	// em disco
+
+	//essa eh a funcao q vai executar na GPU
+	//localfilt(in, out, rows, cols, filt_size);
 
 	/*print the image as ppm to the stdout*/
 	printf("%s\n%s %s\n",format, hash, img_name);
