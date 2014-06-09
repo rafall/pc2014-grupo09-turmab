@@ -13,10 +13,11 @@ C_FLAGS   = -Wall -Wextra -Werror  #Compiler flags
 LD_FLAGS  = #-pthread -lm #			#Linker flags
 
 RUN = ./#program to execute
+FILTER =
 HOSTS = #the hosts file that includes all the nodes available in the cluster
 NP = #number of 
 
-FILE = test.in
+FILE = in.ppm
 TEST = < $(FILE)
 
 PC = ~/Dropbox/University/USP/7Semestre/Concorrentes/pc2014-grupo09-turmab/
@@ -29,8 +30,8 @@ CLUSTER = grupo-09b@wsarch.lasdpc.icmc.usp.br:
 # The variables you shall change
 #
 
-binary = icmctown			   #The executable program to be build
-objects = icmctown.o #List of objects that will be linked
+binary = smooth			   #The executable program to be build
+objects = smooth.o #List of objects that will be linked
 
 garbage = \#* *~		   # Garbage to clean up, e.g. temp files
 
@@ -81,7 +82,7 @@ $(binary) : $(objects)
 # in the pathological case there is a file named 'clean' in the directory.
 
 run : all
-	@$(RUN)$(binary) $(HOSTS) $(NP) $(TEST)
+	@$(RUN)$(binary) $(FILTER) $(HOSTS) $(NP) $(TEST)
 
 phony : clean push pull
 .PHONY : phony
