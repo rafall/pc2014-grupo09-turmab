@@ -120,11 +120,6 @@ int main(int argc, char** argv){
 	scanf("%hu%hu",&cols,&rows);
 	if(_DEBUG_) printf("%hu %hu \t",cols,rows);
 
-	/*------------------IMPORTANT------------------------------------*/
-	/*We have to check wether the ppm file provided by the instructor*/
-	/*Is going to give the max value inside the image - this is not  */
-	/*needed in our application.                                     */
-
 	scanf("%hu", &max_val);
 	if(_DEBUG_) printf(" %hu\n", max_val);
 
