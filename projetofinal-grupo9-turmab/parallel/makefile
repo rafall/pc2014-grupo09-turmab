@@ -9,7 +9,7 @@
 
 CC = gcc #			#The complier (example works for gcc)
 CPP_FLAGS = # 			#Preprocessor flags
-C_FLAGS   = -Wall -Wextra -Werror  #Compiler flags
+C_FLAGS   = -Wall -Wextra #-Werror  #Compiler flags
 LD_FLAGS  = #-pthread -lm #			#Linker flags
 
 RUN = ./#program to execute
@@ -17,8 +17,9 @@ FILTER =
 HOSTS = #the hosts file that includes all the nodes available in the cluster
 NP = #number of 
 
-FILE = in.ppm
-TEST = < $(FILE)
+FILE_IN = ../feep.ppm
+FILE_OUT = out.ppm
+TEST = < $(FILE_IN) > $(FILE_OUT)
 
 PC = ~/Dropbox/University/USP/7Semestre/Concorrentes/pc2014-grupo09-turmab/
 SERVER = ~/grupo-09b/
@@ -88,7 +89,7 @@ phony : clean push pull
 .PHONY : phony
 
 clean: 
-	@rm -f *.o *.d *~ $(binary) $(garbage)
+	@rm -f *.o *.d $(FILE_OUT) *~ $(binary) $(garbage)
 
 push : clean
 	@$(SCOPY) $(PC)$(FOLDER) $(CLUSTER)$(SERVER)
