@@ -10,29 +10,14 @@
 CC = gcc #			#The complier (example works for gcc)
 CPP_FLAGS = # 			#Preprocessor flags
 C_FLAGS   = -Wall -Wextra -Werror  #Compiler flags
-LD_FLAGS  = #-pthread -lm #			#Linker flags
-
-RUN = ./#program to execute
-FILTER =
-HOSTS = #the hosts file that includes all the nodes available in the cluster
-NP = #number of 
-
-FILE_IN = ../feep.ppm
-FILE_OUT = out.ppm
-TEST = < $(FILE_IN) > $(FILE_OUT)
-
-PC = ~/Dropbox/University/USP/7Semestre/Concorrentes/pc2014-grupo09-turmab/
-SERVER = ~/grupo-09b/
-FOLDER = projetofinal-grupo9-turmab
-SCOPY = scp -r -P 2005
-CLUSTER = grupo-09b@wsarch.lasdpc.icmc.usp.br:
+LD_FLAGS  = -lm #			#Linker flags
 
 #
 # The variables you shall change
 #
 
-binary = smooth			   #The executable program to be build
-objects = smooth.o #List of objects that will be linked
+binary = mean_var			   #The executable program to be build
+objects = mean_var.o #List of objects that will be linked
 
 garbage = \#* *~		   # Garbage to clean up, e.g. temp files
 
@@ -82,18 +67,6 @@ $(binary) : $(objects)
 # It not only avoid unecessary file system access but it's also robust
 # in the pathological case there is a file named 'clean' in the directory.
 
-run : all
-	@$(RUN)$(binary) $(FILTER) $(HOSTS) $(NP) $(TEST)
-
-phony : clean push pull
-.PHONY : phony
-
-clean: 
-	@rm -f *.o *.d $(FILE_OUT) *~ $(binary) $(garbage)
-
-push : clean
-	@$(SCOPY) $(PC)$(FOLDER) $(CLUSTER)$(SERVER)
-
-pull :
-	@$(SCOPY) $(CLUSTER)$(SERVER)$(FOLDER) $(PC)
+.PHONY clean:
+	@rm -f *.o *.d *~ $(binary) $(garbage)
 

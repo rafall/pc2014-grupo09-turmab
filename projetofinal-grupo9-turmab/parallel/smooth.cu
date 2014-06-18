@@ -38,7 +38,7 @@
 typedef struct image image;
 
 struct image{
-	usint **r, **g, **b;
+	usint *r, *g, *b;
 };
 
 /*Returns the difference between t0 and t1, i.e. t1-t0 in microseconds.*/
@@ -53,31 +53,23 @@ double time_diff(struct timeval t0, struct timeval t1){
 
 void allocate_img(image *img, usint cols, usint rows){
 
-	usint i;
-
 	/*Allocates the memory needed for the image*/
-	img->r = (usint **) calloc(cols,sizeof(usint *));
-	img->g = (usint **) calloc(cols,sizeof(usint *));
-	img->b = (usint **) calloc(cols,sizeof(usint *));
-
-	for(i = 0; i < cols; i++){
-		img->r[i] = (usint *) calloc(rows,sizeof(usint));
-		img->g[i] = (usint *) calloc(rows,sizeof(usint));
-		img->b[i] = (usint *) calloc(rows,sizeof(usint));
-	}
+	img->r = (usint *) calloc(cols*rows,sizeof(usint));
+	img->g = (usint *) calloc(cols*rows,sizeof(usint));
+	img->b = (usint *) calloc(cols*rows,sizeof(usint));
 
 }
 
-void free_img(image *img, usint size){
+void cuda_Free(image *img){
 
-	usint i;
+	cudaFree(img->r);
+	cudaFree(img->g);
+	cudaFree(img->b);
+	cudaFree(img);
 
-	/*Free used memory*/
-	for(i = 0; i < size; ++i){
-		free(img->r[i]);
-		free(img->g[i]);
-		free(img->b[i]);
-	}
+}
+
+void free_img(image *img){
 
 	free(img->r);
 	free(img->g);
@@ -97,19 +89,19 @@ void localfilt(image *in, image *out, usint rows, usint cols, usint filt_size){
 			sum_r = 0; sum_g = 0; sum_b = 0;
 			for(i = -bdr_diff; i <= bdr_diff; i++){
 				for(j = -bdr_diff; j <= bdr_diff; j++){
-					sum_r += in->r[y-j][x-i];
-					sum_g += in->g[y-j][x-i];
-					sum_b += in->b[y-j][x-i];
+/*					sum_r += in->r[y-j][x-i];*/
+/*					sum_g += in->g[y-j][x-i];*/
+/*					sum_b += in->b[y-j][x-i];*/
 				}
 			}
-			out->r[y-bdr_diff][x-bdr_diff] = sum_r/(filt_size*filt_size);
-			out->g[y-bdr_diff][x-bdr_diff] = sum_g/(filt_size*filt_size);
-			out->b[y-bdr_diff][x-bdr_diff] = sum_b/(filt_size*filt_size);
+/*			out->r[y-bdr_diff][x-bdr_diff] = sum_r/(filt_size*filt_size);*/
+/*			out->g[y-bdr_diff][x-bdr_diff] = sum_g/(filt_size*filt_size);*/
+/*			out->b[y-bdr_diff][x-bdr_diff] = sum_b/(filt_size*filt_size);*/
 		}
 	}
 
-	if(_DEBUG_) for(i=0;i<rows;++i){ for(j=0;j<cols;++j)
-				printf("%hu %hu %hu\t", out->r[j][i],out->g[j][i],out->b[j][i]); printf("\n");}
+/*	if(_DEBUG_) for(i=0;i<rows;++i){ for(j=0;j<cols;++j)*/
+/*				printf("%hu %hu %hu\t", out->r[j][i],out->g[j][i],out->b[j][i]); printf("\n");}*/
 
 }
 
@@ -138,6 +130,7 @@ int main(int argc, char** argv){
 	/*different approach.*/
 	struct timeval t0, t1;
 
+
 	/*Read from the parameters if they changed the filter size, if  */
 	/*not use the default value of 5.                               */
 	if(2 > argc){
@@ -147,70 +140,85 @@ int main(int argc, char** argv){
 		filt_size = (usint) atoi(argv[1]);
 	}
 
-	/*Start reading the data from the stdin*/
-	scanf("%s", format);
-	if(_DEBUG_) printf("%s\n", format);
+	/*Start reading the image as ppm from the stdin*/
+	scanf("%s%s%s", format, hash, img_name);
+	if(_DEBUG_) printf("%s\n%s %s\n", format, hash, img_name);
 
-	scanf("%s%s", hash, img_name);
-	if(_DEBUG_) printf("%s\n", img_name);
-
-	scanf("%hu%hu",&cols,&rows);
-	if(_DEBUG_) printf("%hu %hu\n",cols,rows);
-
-	scanf("%hu", &max_val);
-	if(_DEBUG_) printf("%hu\n", max_val);
+	scanf("%hu%hu%hu",&cols,&rows,&max_val);
+	if(_DEBUG_) printf("%hu %hu\n%hu\n",cols,rows, max_val);
 
 	in = (image *) malloc(sizeof(image));
 	allocate_img(in, cols+filt_size-1, rows+filt_size-1);
 
-	/*makes the border for all the colors (rgb).*/
-
-	/*left and right border.*/
-/*	for(i = 0; i < rows+filt_size-1; i++){*/
-/*		for(j = 0; j < filt_size/2; j++){*/
-			/*left border.*/
-/*			in->r[j][i] = 0;*/
-/*			in->g[j][i] = 0;*/
-/*			in->b[j][i] = 0;*/
-			/*right border.*/
-/*			in->r[cols+filt_size-j-2][i] = 0;*/
-/*			in->g[cols+filt_size-j-2][i] = 0;*/
-/*			in->b[cols+filt_size-j-2][i] = 0;*/
-/*		}*/
-/*	}*/
-
-	/*Top and bottom border.*/
-/*	for(i = filt_size/2; i < cols+(filt_size/2);i++){*/
-/*		for(j = 0; j < filt_size/2; j++){*/
-			/*top border.*/
-/*			in->r[i][j] = 0;*/
-/*			in->g[i][j] = 0;*/
-/*			in->b[i][j] = 0;*/
-			/*bottom border.*/
-/*			in->r[i][rows+filt_size-j-2] = 0;*/
-/*			in->g[i][rows+filt_size-j-2] = 0;*/
-/*			in->b[i][rows+filt_size-j-2] = 0;*/
-/*		}*/
-/*	}*/
-
 	/*Read the matrix from the stdin.*/
 	for(i = 0; i < rows; i++){
 		for(j = 0; j < cols; j++){
-			scanf("%hu%hu%hu",&in->r[j+filt_size/2][i+filt_size/2],
-							  &in->g[j+filt_size/2][i+filt_size/2],
-							  &in->b[j+filt_size/2][i+filt_size/2]);
+			scanf("%hu%hu%hu",&in->r[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2],
+							  &in->g[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2],
+							  &in->b[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2]);
 		}
 	}
 
 	if(_DEBUG_) for(i=0;i<rows+filt_size-1;++i){ for(j=0;j<cols+filt_size-1;++j)
-				printf("%hu %hu %hu\t", in->r[j][i],in->g[j][i],in->b[j][i]); printf("\n");}
-
-	/*Point where the timer is started.*/
-	gettimeofday(&t0, NULL);
+				printf("%hu %hu %hu\t", in->r[(i*(cols+filt_size/2+1))+j+filt_size/2-1],
+										in->g[(i*(cols+filt_size/2+1))+j+filt_size/2-1],
+										in->b[(i*(cols+filt_size/2+1))+j+filt_size/2-1]);
+				printf("\n");}
 
 	out = (image *) malloc(sizeof(image));
 	allocate_img(out, cols, rows);
-	localfilt(in, out, rows, cols, filt_size);
+
+	/*Images that are goin to be used in the device.*/
+	image *dev_in = NULL,*dev_out = NULL;
+
+	gettimeofday(&t0, NULL);
+
+	/*Allocates the memory needed in the device.*/
+	cudaMalloc( (void**)&dev_in, sizeof(image));
+	cudaMalloc( (void**)&dev_in->r, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *));
+	cudaMalloc( (void**)&dev_in->g, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *));
+	cudaMalloc( (void**)&dev_in->b, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *));
+
+	cudaMalloc( (void**)&dev_out, sizeof(image));
+	cudaMalloc( (void**)&dev_out->r, (rows)*(cols) * sizeof(usint *));
+	cudaMalloc( (void**)&dev_out->g, (rows)*(cols) * sizeof(usint *));
+	cudaMalloc( (void**)&dev_out->b, (rows)*(cols) * sizeof(usint *));
+
+	/*Copy the image from the host to the device (CPU -> GPU)*/
+	cudaMemcpy( dev_in, in, sizeof(image), cudaMemcpyDeviceToHost);
+	cudaMemcpy( dev_in->r, in->r, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *), cudaMemcpyHostToDevice);
+	cudaMemcpy( dev_in->g, in->g, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *), cudaMemcpyHostToDevice);
+	cudaMemcpy( dev_in->b, in->b, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *), cudaMemcpyHostToDevice);
+
+	//http://mc.stanford.edu/cgi-bin/images/b/ba/M02_2.pdf
+	//http://mc.stanford.edu/cgi-bin/images/0/0a/M02_4.pdf
+	//http://mc.stanford.edu/cgi-bin/images/5/5f/Darve_cme343_cuda_2.pdf
+	//chama as funcoes assincronamente (quero fazer o mais facil)
+	//se for mais facil chamar uma por vez podemos usar so uma matriz de retorno
+	//dev_out que vai ser um usint de tamanho row*cols.
+	//e passar uma matrix de cada vez... um cudaMalloc num usint na placa e passa tudo pra ele
+	//pq os canais sao independentes
+	//ver se nao vai dar pau a alocacao da estrutura.. to com medo por causa do mpi q dava bosta...
+
+	//1 - copiar as matrizes para a GPU (nao esquecer de alocar memoria na GPU) - Done (ver se ta fundando)
+	//2 - mais as flags necessarias (numero de threads, blocks, vao ser 3 grids (RGB)) - Aqui precisa definir o algoritmo q vai usar para as threads e talz
+	//3 - copiar para a shared memory a parte da matriz q vai (syncthreads) - melhora no speed up (aula)
+	//usar pra fazer o calculo (isso eh na funcao que vai ser executada na gpu)
+	//4 - inicializar 3 kernels (funcoes q vao ser executada na GPU) um para cada
+	// espectro de cor (RGB) - isso eh assincrono
+	//5 - Pesquisar com vai esperar o resultado dos kernels para poder salvar a imagem
+	// em disco com a copia do resultado da placa - FEITO
+
+	//essa eh a funcao q vai executar na GPU
+	//localfilt(in, out, rows, cols, filt_size);
+
+	cudaDeviceSynchronize();
+
+	/*Copy the result from the device to the host. (GPU -> CPU)*/
+	cudaMemcpy(out, dev_out, sizeof(image), cudaMemcpyDeviceToHost);
+	cudaMemcpy(out->r, dev_out->r, rows*cols*sizeof(usint), cudaMemcpyDeviceToHost);
+	cudaMemcpy(out->g, dev_out->g, rows*cols*sizeof(usint), cudaMemcpyDeviceToHost);
+	cudaMemcpy(out->b, dev_out->b, rows*cols*sizeof(usint), cudaMemcpyDeviceToHost);
 
 	/*Point where the timer is stopped.*/
 	gettimeofday(&t1, NULL);
@@ -222,14 +230,17 @@ int main(int argc, char** argv){
 	printf("%hu %hu\n%hu\n", cols, rows, max_val);
 	for( i = 0; i < rows; i++){
 		for(j=0;j< cols-1; j++){
-			printf("%hu %hu %hu   ", out->r[j][i],out->g[j][i],out->b[j][i]);
+			printf("%hu %hu %hu   ", out->r[i*cols+j],out->g[i*cols+j],out->b[i*cols+j]);
 		}
-		printf("%hu %hu %hu", out->r[j][i],out->g[j][i],out->b[j][i]);
+		printf("%hu %hu %hu", out->r[i*cols+j],out->g[i*cols+j],out->b[i*cols+j]);
 		printf("\n");
 	}
 
-	free_img(in, cols+filt_size-1);
-	free_img(out, cols);
+	free_img(in);
+	free_img(out);
+
+	cuda_Free(dev_in);
+	cuda_Free(dev_out);
 
 	return EXIT_SUCCESS;
 }
