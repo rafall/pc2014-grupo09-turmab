@@ -16,6 +16,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include "cuda.h"
 
 /*Show debug messages*/
 #define _DEBUG_ 0
