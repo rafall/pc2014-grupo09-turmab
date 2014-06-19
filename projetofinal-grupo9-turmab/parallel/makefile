@@ -7,7 +7,7 @@
 # at the command line.  Since we then use *_FLAG before *FLAG, the user
 # can eventually overwirte our flags with his own flags.
 
-CC = gcc #			#The complier (example works for gcc)
+CC = nv	cc #			#The complier (example works for gcc)
 CPP_FLAGS = # 			#Preprocessor flags
 C_FLAGS   = -Wall -Wextra #-Werror  #Compiler flags
 LD_FLAGS  = #-pthread -lm #			#Linker flags
@@ -44,8 +44,8 @@ all : $(binary)
 
 # Pattern rule to build objects from sources
 
-%.o : %.c
-	@$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
+%.o : %.cu
+	$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
 
 # For each file.o in $(object) we want to add a line in the form
 # 'file.o: header1.h header2.h ... headerN.h'
@@ -65,8 +65,8 @@ all : $(binary)
 # and $@ stands for the target. $(something:token=other) is $(something) with
 # the substring 'token' replaced with 'other'.
 
-%.d: %.c
-	@$(CC) -MM -MT '$(<:.c=.o) $@' $(CPPFLAGS) $< > $@
+%.d: %.cu
+	@$(CC) -MM -MT '$(<:.cu=.o) $@' $(CPPFLAGS) $< > $@
 
 # Including the object's dependencies on headers
 
@@ -92,7 +92,7 @@ clean:
 	@rm -f *.o *.d $(FILE_OUT) *~ $(binary) $(garbage)
 
 push : clean
-	@$(SCOPY) $(PC)$(FOLDER) $(CLUSTER)$(SERVER)
+	@$(SCOPY) $(PC)$(FOLDER) $(CLUSTER)
 
 pull :
 	@$(SCOPY) $(CLUSTER)$(SERVER)$(FOLDER) $(PC)
