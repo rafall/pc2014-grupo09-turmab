@@ -89,7 +89,7 @@ phony : clean push pull
 .PHONY : phony
 
 clean: 
-	@rm -f *.o *.d $(FILE_OUT) *~ $(binary) $(garbage)
+	@rm -f *.o *.d   $(FILE_OUT) *~ $(binary) $(garbage)
 
 push : clean
 	@$(SCOPY) $(PC)$(FOLDER) $(CLUSTER)$(SERVER)

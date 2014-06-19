@@ -3,6 +3,7 @@
 size="20"
 file="out"
 filt_size="5 7 11"
+image_dir="../images/"
 images=("marvel.ppm")
 
 seq_alg(){
@@ -19,7 +20,7 @@ seq_alg(){
 		for m in $filt_size; do
 			echo "$size 2" > $path/$m$j.$file
 			for i in $(seq $size); do 
-				echo "./$path/$exe $m < $j >> $path/$m$j 2> $path/$m$j.$file"
+				echo "./$path/$exe $m < $image_dir$j >> $path/$m$j 2> $path/$m$j.$file"
 			done
 		done
 	done
@@ -67,7 +68,7 @@ par_alg(){
 		for i in $filt_size; do
 			echo "$size 2" > $path/$m$j.$file
 			for m in $(seq $size); do
-				./$path/$exe $i < $j > $path/$i$j 2> $path/$i$j.$file
+				./$path/$exe $i < $image_dir$j > $path/$i$j 2> $path/$i$j.$file
 			done
 		done
 	done
@@ -91,7 +92,7 @@ par_mean(){
 
 	for j in "${images[@]}"; do
 		for i in $filt_size; do
-			./$path/$exe < $directory/$i$j.$file > $directory/$i$j.$mean_file
+			./$path/$exe < $directory/$i$j.$file > $directory/$i$j.$mean_file 
 		done
 	done
 
