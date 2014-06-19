@@ -7,9 +7,9 @@
 # at the command line.  Since we then use *_FLAG before *FLAG, the user
 # can eventually overwirte our flags with his own flags.
 
-CC = nv	cc #			#The complier (example works for gcc)
-CPP_FLAGS = # 			#Preprocessor flags
-C_FLAGS   = -Wall -Wextra #-Werror  #Compiler flags
+CC = nvcc #			#The complier (example works for gcc)
+CPP_FLAGS = -arch=sm_20# 			#Preprocessor flags
+C_FLAGS   = #-Wall -Wextra #-Werror  #Compiler flags
 LD_FLAGS  = #-pthread -lm #			#Linker flags
 
 RUN = ./#program to execute
@@ -45,7 +45,7 @@ all : $(binary)
 # Pattern rule to build objects from sources
 
 %.o : %.cu
-	$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
+	@$(CC) $(CPP_FLAGS) $(C_FLAGS) $(CPPFLAGS) $(CFLAGS) -c $<  
 
 # For each file.o in $(object) we want to add a line in the form
 # 'file.o: header1.h header2.h ... headerN.h'
