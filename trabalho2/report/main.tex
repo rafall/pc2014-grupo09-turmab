@@ -1,0 +1,613 @@
+% Exemplo de relatório técnico do IC
+
+% Criado por P.J.de Rezende antes do Alvorecer da História.
+% Modificado em 97-06-15 e 01-02-26 por J.Stolfi.
+% modificado em 2003-06-07 21:12:18 por stolfi
+% modificado em 2008-10-01 por cll
+% \def\lastedit{2010-03-16 17:56:58 by stolfi}
+
+\nonstopmode % PARA RODAR LATEX EM BATCH MODE
+\documentclass[11pt,twoside]{article}
+
+%INSERTED BY ME
+%used to comment mutiple lines within a document
+\usepackage{verbatim}
+\usepackage[toc,page]{appendix}
+\usepackage{float}
+\usepackage{indentfirst} %indent all the paragrafers
+\usepackage[pdftex]{hyperref}
+\usepackage[lined, boxed, commentsnumbered, linesnumbered]{algorithm2e}
+\usepackage{listings}
+\usepackage{color}
+
+\renewcommand*{\listalgorithmcfname}{Lista de Algoritmos}
+\renewcommand*{\algorithmcfname}{Algoritmos}
+\renewcommand*{\algorithmautorefname}{algoritmos}
+
+\renewcommand*{\lstlistingname}{C\'{o}digo}
+\renewcommand{\lstlistlistingname}{Lista de C\'{o}digos}
+\def\lstlistingautorefname{SQL Code}
+\lstset{escapeinside=||}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  language=C,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+}
+
+\begin{comment}
+
+    %--------------------------------SECTION{COMMENT}----------------------------------------
+    
+    \section{}
+    
+    %--------------------------------END{COMMENT}--------------------------------------------
+
+
+    %--------------------------------SUBSECTION{COMMENT}-------------------------------------
+        
+        \subsection{}
+
+    %--------------------------------END{COMMENT}--------------------------------------------
+
+    %--------------------------------SUBSUBSECTION{COMMENT}----------------------------------
+    
+            \subsubsection{}
+            
+    %--------------------------------END{COMMENT}--------------------------------------------
+
+% Inserting Image
+
+    \begin{figure}[H]
+        \centering
+    	\includegraphics[width=11cm,height=8cm]{}
+		\caption{}
+		\label{}
+	\end{figure}
+
+% Inserting Code----------------------------
+
+\usepackage{listings}
+\usepackage{color}
+\lstset{escapeinside=||}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  language=C,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+}
+
+% Enumerate with roman
+\renewcommand{\theenumi}{\roman{enumi}}
+\begin{enumerate}
+
+\end{comment}
+%INSERTED BY ME
+
+
+
+\usepackage{techrep-ic}
+
+%%% SE USAR INGLÊS, TROQUE AS ATIVAÇÕES DOS DOIS COMANDOS A SEGUIR:
+\usepackage[brazil]{babel}
+%% \usepackage[english]{babel}
+
+%%% SE USAR CODIFICAÇÃO LATIN1 OU UTF-8, ATIVE UM DOS DOIS COMANDOS A
+%%% SEGUIR:
+%%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
+
+%%% Para obter o tamanho de texto recomendado:
+\usepackage[margin=1in]{geometry}
+
+
+\begin{document}
+
+%%% PÁGINA DE CAPA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% Número do relatório
+\TRNumber{001}
+
+% DATA DE PUBLICAÇÃO (PARA A CAPA)
+%
+\TRYear{14} % Dois dígitos
+\TRMonth{3} % Numérico, 01-12
+
+% LISTA DE AUTORES PARA CAPA (sem afiliações).
+\TRAuthor{F. N. Candiani \and M. L. Junior \and R. H. F. Minami}
+
+% TÍTULO PARA A CAPA (use \\ para forçar quebras de linha).
+\TRTitle{Comparação de \textit{speedup} de programas\\ paralelos e sequenciais utilizando a\\ biblioteca Open MPI}
+
+\TRMakeCover
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% O que segue é apenas uma sugestão - sinta-se à vontade para
+% usar seu formato predileto, desde que as margens tenham pelo
+% menos 25mm nos quatro lados, e o tamanho do fonte seja pelo menos
+% 11pt. Certifique-se também de que o título e lista de autores
+% estão reproduzidos na íntegra na página 1, a primeira depois da
+% página de capa.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Nomes de autores ABREVIADOS e titulo ABREVIADO,
+% para cabeçalhos em cada página.
+%
+\markboth{Candiani, Junior e Minami}{Speedup paralelo e sequencial}
+\pagestyle{myheadings}
+\thispagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TÍTULO e NOMES DOS AUTORES, completos, para a página 1.
+% Use "\\" para quebrar linhas, "\and" para separar autores.
+%
+\title{Comparação de \textit{speedup} de programas paralelos e sequenciais utilizando a biblioteca Open MPI}
+
+\author{Fernando N. Candiani\thanks{Inst.~de Ciências Matemáticas e Computação, USP. N USP: 7239131 \texttt{fncandiani@usp.br}} \and
+Marcius L. Junior\thanks{Inst.~de Ciências Matemáticas e Computação, USP. N USP: 7277433 \texttt{marcius@usp.br}} \and
+Rafael H. F. Minami\thanks{Inst.~de Ciências Matemáticas e Computação, USP. N USP: 7573187 \texttt{rafahiroki@usp.br}}}
+
+\date{}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\listoffigures
+\listoftables
+\lstlistoflistings
+\listofalgorithms
+
+\clearpage
+
+\begin{abstract} 
+    In this assignment we used the Dijkstra's and Floyd–Warshall algorithm to
+    calculate the best position of a hospital within a fictional city that is
+    built as an undirected graph. We build a program that use different programming
+    paradigms; one sequencial and the other parallel, using the Open MPI library.
+    After executing each program multiples times we calculated the speedup so we 
+    could compare the improvement of the usage of parallel paradigm rather than
+    sequencial. This article shows the results obtained during the experiments 
+    and problems regarding the implementation of the parallel algorithm and its
+    execution.
+\end{abstract}
+
+
+\section{Introdução}
+
+    Neste relatório nós mostraremos os resultados obtidos e faremos a comparação entre a
+    versão sequencial e a paralela de um algoritmo de cálculo de menor caminho. Todos os
+    códigos e saídas dos programas, bem como os métodos de compilação, podem ser 
+    encontrados dentro do nosso repositório do 
+    {\it Google Code}\footnote{https://code.google.com/p/pc2014-grupo09-turmab/\label{fnt:code}}.
+
+    \subsection{Descrição do problema}
+    
+        O prefeito de {\it ICMCTown} quer construir um hospital na cidade, que não possui nenhum.
+        Como você é considerado um gênio da computação na cidade, ele te pediu para ajudar a escolher
+        o local perfeito onde o hospital vai ser construído. O hospital deve ser construído de tal
+        forma que a maior distância entre uma casa e o hospital seja a mínima possível.
+
+        O sistema de ruas de {\it ICMCTown} é representado por $n$ junções (ou esquinas), conectadas
+        por $m$ ruas bidirecionais. Para cada rua, nós conhecemos sua extensão. Nós também sabemos
+        que é possível chegar de uma junção para qualquer outra se movendo pelas ruas.
+
+        Sua tarefa é descobrir a localização do hospital, tal que a distância mais curta percorrida
+        pelas ruas da cidade entre o hospital e a junção mais distante seja mínima.
+        O hospital deve estar localizado em uma junção obrigatoriamente.
+        
+
+
+\section{Algoritmos de menor caminho}
+
+    Nesta seção explicaremos e discutiremos dois algoritmos que são utilizados para calcular o menor
+    caminho em um grafo.
+
+    \subsection{{\it Floyd-Warshall}}
+    
+        O algoritmo de {\it Floyd-Warshall} calcula o caminho mais curto entre todos os pares de vértices de
+        um grafo orientado e valorado (positivo e negativo), desde que não possua ciclos negativos.
+        O algoritmo é apresentado em Algoritmo \ref{alg:floydwarshall}. Sua complexidade é de 
+        $\theta(|V|^3)$\cite{pallottino1984}, onde V é o número de vértices..
+
+        \begin{algorithm}[ht]
+            \SetKwData{Left}{left}
+            
+            \KwData{VAR Integer[1..n, 1..n] dist = graph}
+            \KwData{VAR Integer[1..n, 1..n] dist = pred}
+            
+            
+            \tcp{Initialization of the needed variables}
+            \For{$i \gets 1$ \textbf{to} $n$}{
+                \For{$j \gets 1$ \textbf{to} $n$}{
+                    \If{$dist[i,j] < Infinity$}{
+                        pred[i,j] = i\;
+                    }
+                }
+            }
+            \tcp{Main loop for the algorithm}
+            \For{$k \gets 1$ \textbf{to} $n$}{
+                \For{$i \gets 1$ \textbf{to} $n$}{
+                    \For{$j \gets 1$ \textbf{to} $n$}{
+                        \If{$dist[i, j] > dist[i, k] + dist[k, j]$}{
+                        dist[i, j] = dist[i, k] + dist[k, j]\;
+                        pred[i, j] = pred[k, j]\;
+                        }
+                    }
+                }
+            }
+            \caption{Pseudo código do algoritmo de Floyd-Warshall}
+            \label{alg:floydwarshall}
+        \end{algorithm}
+    
+    \subsection{{\it Dijkstra}}
+    
+        O algoritmo de {\it Dijkstra} calcula o caminho mais curto entre um vértice de origem e
+        todos os outros pares de vértices de um grafo orientado e valorado (somente positivo).
+        O algoritmo é apresentado em Algoritmo \ref{alg:dijkstra}. Sua complexidade é de 
+        $\theta(|V|^2)$\cite{cormen2001}, onde V é o número de vértices.
+
+        \begin{algorithm}[ht]
+            \For{\textbf{each} $vertex$ $v$ $in$ $Graph$}{
+                dist[v] = infinity\;
+                
+                previous[v] = undefined\;
+            }
+            
+            dist[source] = 0\;
+            
+            Q = set of all nodes in Graph\;
+            
+            \While{$Q$ \textbf{is not} $empty$}{
+                u = vertex in Q  with smaller distance in dist[]\;
+                
+                remove u from Q\;
+                
+                \If{$dist[u] == infinity$}{
+                    \textbf{break}\;
+                }
+                
+                \For{\textbf{each} $neighbor$ $v$ $of$ $u$}{
+                    alt = dist[u] + dist\_between(u, v)\;
+                    
+                    \If{$alt < dist[v]$}{
+                        dist[v] = alt\;
+                        
+                        previous[v] = u\;
+                        
+                        decrease-key v in Q\;
+                        
+                    }
+                }
+                
+            }
+            \textbf{return} $dist[], previous[]$\;
+            
+            \caption{Pseudo código do algoritmo de {\it Dijkstra}}
+            \label{alg:dijkstra}
+        \end{algorithm}
+
+\section{{\it Open MPI}}
+    
+    Nesta seção é apresentado uma explicação resumida do funcionamento do {\it Open MPI}
+    e como o utilizamos em nossa solução.
+
+    \subsection{Resumo}
+    O {\it Open MPI} é uma biblioteca de {\it Message Passing} e foi desenvolvida com o intuito de facilitar a implementação de ambientes de memória distribuída.
+    Ela oferece a estrutura necessária para se passar informações entre processadores ou nós de um {\it cluster}.
+
+    \subsection{Aplicando ao nosso problema}
+    %%explicar escolha do dijkstra (paralelizar execucao)
+
+\section{Como executar o programa}
+    
+    Nesta seção é apresentado como é feita a compilação e execução e os parâmetros de execução
+    e, também, os de entrada do programa.
+    
+    \subsection{Sequencial}
+    
+	    Estando dentro do diretório {\it sequencial} onde contém os arquivos
+		{\it makefile} e {\it icmctown.c}, que pode ser visto em Código
+		\ref{code:icmctown_seq}, devemos executar os seguintes comandos:\\
+
+		{\it usuer@pc-name:dir~\$ make}\\
+
+		O comando {\it make} irá compilar o Código \ref{code:icmctown_seq} passando
+		todos os parâmetros de lincagem das bibliotecas extras.\\
+
+		{\it user}@{\it pc-name:dir~}\${\it /usr/bin/time -f }"\%{\it e}" ./{\it icmctown}
+		$<$ {\it path}/{\it file.in} $>>$ {\it path}/{\it file.out 2}$>$\&{\it 1} \\
+
+		O comando irá executar o programa para o da melhor posição para o hospital, 
+		redirecionando o tempo e o valor da maior menor distância {\it file.out}.\\
+
+    \subsection{Paralelo}
+    
+    	Por possuir mais parâmetros de execução foi construído um comando que executa automaticamente
+    	o código paralelo. Para executar o programa devemos executar os sequintes comandos:\\
+    	
+    	{\it usuer@pc-name:dir~\$ make run $>>$ {\it path}/{\it file.out 2}$>$\&{\it 1} \\
+    	
+    	O comando {\it make run} irá compilar o Código \ref{code:icmctown_par} passando
+		todos os parâmetros de lincagem das bibliotecas extras. E depois executar o código
+		com os parâmetros padrões que são $2$ nós e o arquivo {\it input1} como caso de teste.
+		Porém essas variáveis podem ser redifinidas na exucução da seguinte forma:
+		
+    	{\it usuer@pc-name:dir~\$ make run FILE=filename CNP=numberofnodes $>>$ 
+    	{\it path}/{\it file.out 2}$>$\&{\it 1} \\
+    	
+    	Esse comando trocará o teste para {\it filename} e o número de nós {\it numberofnodes}.
+
+ 
+\section{Dificuldades e Soluções}
+
+    \subsection{Sequencial}
+    
+        Não tivemos muitos problemas no desenvolvimento da solução sequencial, somente na hora
+        de definir a estrutura que seria utilizada para a construção do grafo. Ao invés de utilizarmos
+        uma matriz ou vetor o grupo decidiu fazer uso de um {\it TAD} de um grafo bem definido. O que
+        acabou aumentando um pouco a complexidade da programação e desenvolvimento do algoritmo do
+        {\it Dijkstra}.
+
+    \subsection{Paralelo}
+    
+        A solução paralela, utilizando {\it Open MPI}, trouxe várias dificuldades no começo, pois a ferramenta
+        era pouco conhecida e erros básicos tomavam muito tempo para serem resolvidos. Os principais erros
+        ocorridos aconteceram na hora da transmissão dos dados para os nós do {\it cluster}, pois a transmissão
+        deve ser feita dos dados e não dos endereços dos dados. Como o grupo decidiu utilizar uma estrutura mais
+        complexa que uma matriz ou vetor a sua transmissão, também, seria muito complexa. A solução obtida foi
+        salvar os dados que são necessários para a criação do grafo em 3 vetores e ao invés de criar o grafo
+        e enviá-lo estes vetores são enviados e um grafo é criado em cada nó.
+
+\section{Resultados Obtidos}
+
+	Nesta seção são apresentados os resultados obtidos na execução dos problemas paralalelos e sequencial.
+
+    \subsection{Sequencial}
+        \subsubsection{Input 1}
+    	\subsubsection{Input 2}
+    	\subsubsection{Input 3}
+    \subsection{Paralelo}
+    	\subsubsection{Input 1}
+    	\subsubsection{Input 2}
+		\subsubsection{Input 3}
+		
+\section{Metodologia de execução dos experimentos}
+
+    Para a execução dos programas feitos, foi criado um \textit{script}, mostrado em Código
+    \ref{code:script}, que é capaz de executar os programas de forma automatizada.
+    Dentro do {\it script} é possível definir o número de vezes que será executado, através da
+    variável {\it size}, cada caso de teste, que é definido na variável {\it tests}. Na parte
+    paralela é possível definir o número de hosts que cada código será executado, através da
+    variável {\it hosts}, ou seja, cada teste será executado $n$ vezes para cada quantidade
+    de hosts definida.
+
+    Esse \textit{script} faz a compilação e execução dos programas e após a execução esse
+    redireciona todos os resultados para um arquivo. Esse arquivo, que foi formatado de forma
+    simples, é utilizado para o cálculo da média, variância e intervalo de confiança, conforme
+    mostrado na Seção \ref{sec:mean_var}, dos dados que foram gerados pelos programas,
+    assim podemos analisar melhor os resultados gerados.
+    
+    \subsection{Dificuldades e Soluções}
+
+        Durante a execução do \textit{script} tivemos alguns problemas na conexão com o cluster
+        gerando \textit{broken pipes} com este. Por isso, tivemos que fazer algumas alterações na
+        chamada dos métodos criados dentro do \textit{script}, por exemplo, quando estavamos
+        executando o programa paralelo ocorreu um problema de conexão e tivemos que comentar
+        a chamada de função do programa sequencial pois este já havia sido executado.
+        
+        Outro problema gerado pela falha na conexão foi que o arquivo já possuía dados gerados
+        na execução anterior e por isso o tipo de \textit{pipe}, que antes era um \textit{pipe}
+        de redirecionamento simples, foi alterado para um \textit{pipe} de concatenação para que
+        os dados gerados na execução anterior fossem mantidos e não fosse necessário a execução
+        do \textit{script} desde o início.
+        
+        Outra problema encontrado no desenvolvimento do \textit{script} foi o redirecionamento
+        da saída do programa \textit{/usr/bin/time} pois este redireciona sua saída para a
+        \textit{stderr} ao invés da \textit{stdout}. A solução encontrada foi acrescentar
+        uma \textit{flag} ao redirecionamento que faz com que o \textit{stderr} também seja redirecionado
+        ao arquivo passado, isso foi obtido com o comando "2$>$\&1".
+    
+
+\section{Cálculo da média, variância e intervalo de confiança dos dados}
+\label{sec:mean_var}
+
+    Como a execução de cada programa foi feita múltiplas vezes, no nosso caso foi executado
+    $20$ vezes, seria inviável calcular a média, desvio padrão e intervalo de confiança dos 
+    dados gerados de forma manual. Por isso, foi criado um programa, conforme mostrado em
+    Código \ref{code:mean_var}, que dado o tamanho de um vetor e o número de variáveis a
+    ser analisado calculará a média, variância e intervalo de confiança, levando em 
+    consideração que os dados estão distribuídos da seguinte maneira:
+    
+    \ \\
+    \ \indent quantidade dos dados \indent número de variáveis\\
+    \ \indent dado 1 da variável a\\
+    \ \indent dado 1 da variável b\\
+    \ \indent dado 2 da variável a\\
+    \ \indent dado 2 da variável b\\
+    \ \indent e assim por diante.
+    \ \\
+    
+    Os dados gerados por esse programa serão apresentados dentro das seções respectivas aos
+    seus dados.
+
+\section{Como calcular o {\it Speedup }}
+\label{sec:speedup}
+
+    Como o próprio termo já diz, o {\it speedup} é o ganho na velocidade quando se compara duas
+    situações. No nosso caso usamos o {\it speedup} para calcular o ganho na velocidade de
+    execução entre um programa sequencial e um programa paralelo, por isso para saber qual
+    a vantagem entre os dois devemos resolver a seguinte razão:
+    
+    \begin{equation}
+        S_p = \frac{T_1}{T_p}
+    \end{equation}
+
+    onde $S_p$ é o {\it speedup},
+    
+    $T_1$ é o tempo médio do algoritmo sequencial e
+    
+    $T_p$ é o tempo médio do algoritmo paralelo.\\
+    
+    Espera-se que esse número seja sempre $> 1$ pois isso mostra que o houve um ganho
+    no algoritmo paralelo em relação ao sequencial. Para ter um bom {\it speedup}
+    o valor $S_p$ esperado deve ser $ > 2$, ou seja, houve uma diminuição de cerca de
+    $50\%$ no tempo de execução do programa sequencial em relação ao paralelo.
+
+\section{Hardware utilizado}
+
+    Para todos os programas o mesmo hardware foi utilizado, o do \textit{cluster}. Para obter
+    a descrição detalhada do hardware utilizamos o seguinte programa, com um parâmetro:
+    
+    \ \\ \ \indent {\it phoronix-test-suite detailed-system-info}
+    \ \\
+    
+    A saída obtida foi a seguinte (a grande maioria dos dados são auto-explicativos e por isso
+    não será discutido):
+    \ \\ \ \\
+    {\hspace{2 cm}{\it Phoronix Test Suite v4.8.2\\
+         System Information\\
+        \ \\
+        Hardware: \\
+        Processor: Intel Core 2 Quad Q9400 @ 2.67GHz (4 Cores), \\
+        Motherboard: Gigabyte G41MT-S2P,\\
+        Chipset: Intel 4 DRAM + ICH7,\\
+        Memory: 8192MB,\\
+        Disk: 500GB Western Digital WD5000AACS-0,\\
+        Graphics: Intel 4 IGP,\\
+        Audio: VIA VT2020,\\
+        Network: Realtek RTL8111/8168/8411
+        \ \\
+        Software:\\
+        OS: Ubuntu 12.04, Kernel: 3.2.0-54-generic (x86\_64), Compiler: GCC 4.6,\\
+        File-System: ext4, Screen Resolution: 640x480\\
+        \ \\
+        Processor: \\
+        Core Count: 4\\
+        Thread Count: 4\\
+        Cache Size: 3072 KB\\
+        Instruction Set Extensions: SSE 4.1\\
+        AES Encryption: NO\\
+        Energy Performance Bias: NO\\
+        Virtualization: VT-x\\
+        Compiler Configuration: --build=x86\_64-linux-gnu --disable-werror --enable-checking=release --enable-clocale=gnu --enable-gnu-unique-object --enable-languages=c,c++,fortran,objc,obj-c++ --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-nls --enable-objc-gc --enable-plugin --enable six --host=x86\_64-linux-gnu --target=x86\_64-linux-gnu --with-arch-32=i686 --with-tune=generic -v\\
+        Disk Scheduler: CFQ\\
+        Disk Mount Options: barrier=1,data=ordered,relatime,rw,user\_xattr\\
+        Cpu Scaling Governor: acpi-cpufreq ondemand}}
+
+\section{Conclusão}
+
+    A partir dos resultados obtidos através de nossos algoritmos fica clara a vantagem
+    de se paralelizar processos para se obter um ganho considerável de eficiência, apenas
+    quando o {\it overhead} de transmissão de dados não supera a complexidade computacional
+    de execução do problema, ou seja, em casos pequenos o {\it overhead} de transmissão. Em
+    nossos testes também observamos que existe uma relação entre o número de núcleos
+    que o hardware possui e o número máximo de threads que ele pode suportar, depois
+    desse número máximo a eficiência é diminuída. Isso ocorre por causa da quantidade
+    de chaveamentos que precisam ocorrer para que as {\it threads} executem, aumentando,
+    assim, o tempo de execução.
+
+\clearpage
+
+\begin{appendices}
+
+    \chapter{Script para execução dos experimentos}
+        \lstinputlisting[caption=Script para execução dos experimentos, language=sh, label=code:script]{codes/script.sh}
+
+    \ \\
+
+    \chapter{Código para cálculo da média, variância e intervalo de confiança dos dados}
+        \lstinputlisting[caption=Cálculo da média\, variância e intervalo de confiança dos dados., label=code:mean_var]{codes/mean_var.c}
+    \ \\
+        
+    \chapter{Código para cálculo da posição do hospital, algoritmo sequencial}
+        \lstinputlisting[caption=Algoritmo de {\it Dijkstra} com execução sequencial., label=code:icmctown_seq]{codes/icmctown_seq.c}
+        
+    \ \\
+        
+    \chapter{Código para cálculo da posição do hospital, algoritmo utilizando {\it Open MPI}}
+        \lstinputlisting[caption=Algoritmo de {\it Dijkstra} com execução paralela., label=code:icmctown_par]{codes/icmctown_par.c}
+        
+    \ \\
+        
+    \chapter{Arquivo hosts utilizado para a execução paralela utilizando {\it Open MPI}}
+        \lstinputlisting[caption=Arquivo hosts., label=code:hosts]{codes/hosts}
+        
+    \ \\
+    
+    \chapter{Caso de teste 1}
+        \lstinputlisting[caption=Arquivo que contém o grafo para o teste 1., label=code:test1]{codes/input1}
+        
+    \ \\
+        
+    \chapter{Caso de teste 2}
+        \lstinputlisting[caption=Arquivo que contém o grafo para o teste 2., label=code:test2]{codes/input2}
+        
+    \ \\
+    
+    \chapter{Caso de teste 3}
+        \lstinputlisting[caption=Arquivo que contém o grafo para o teste 3., label=code:test3]{codes/input3}
+        
+    \ \\
+
+\end{appendices}
+
+\clearpage
+
+\begin{thebibliography}{99}
+
+    \bibitem{pallottino1984} Pallottino, S. (1984). Shortest-path methods: Complexity, interrelations and new propositions. {\it Networksm 14}(2), 257-267.
+    
+    \bibitem{cormen2001} Cormen, T. H.m Leiserson, C. E., Rivest, R. L. \& Stein, C. (2001). {\it Introduction to algorithms} (Vol. 2, pp. 531-549). Cambridge: MIT press.
+
+\end{thebibliography}
+
+\end{document}
