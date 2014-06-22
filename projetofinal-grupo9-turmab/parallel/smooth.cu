@@ -12,12 +12,10 @@
 /*  information.                                                     */
 /*  email: fncandiani, marcius, rafahiroki @usp.br                   */
 /* ----------------------------------------------------------------- */
-//comentado
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include "cuda.h"
 
 /*Show debug messages*/
 #define _DEBUG_ 0
@@ -28,7 +26,9 @@
 #define _MEM_ERR_ 2
 
 /*Default filter size*/
-#define _FILT_SIZE_ 3
+#define _FILT_SIZE_ 5
+#define _SIZE_F_ 1024.0
+#define _SIZE_ 1024
 
 /*Value that is used to transform from microseconds to seconds.*/
 #define _SEC_TO_USEC_ 1000000
@@ -36,82 +36,45 @@
 /*shorter string for the unsigned short int type.*/
 #define usint unsigned short int
 
-/*Structure that will save all the image data, i.e. the RBG colors.*/
-typedef struct image image;
-
-struct image{
-	usint *r, *g, *b;
-};
-
 /*Returns the difference between t0 and t1, i.e. t1-t0 in microseconds.*/
 double time_diff(struct timeval t0, struct timeval t1){
 	return ((double)t1.tv_sec*_SEC_TO_USEC_ + (double)t1.tv_usec)
 		  -((double)t0.tv_sec*_SEC_TO_USEC_ + (double)t0.tv_usec);
 }
 
-
-/*The matrices that are constructed here are colums by rows, not the   */
-/*usual rows by columns.*/
-
-void allocate_img(image *img, usint cols, usint rows){
-
-	/*Allocates the memory needed for the image*/
-	img->r = (usint *) calloc(cols*rows,sizeof(usint));
-	img->g = (usint *) calloc(cols*rows,sizeof(usint));
-	img->b = (usint *) calloc(cols*rows,sizeof(usint));
-
-}
-
-void cuda_Free(image *img){
-
-	cudaFree(img->r);
-	cudaFree(img->g);
-	cudaFree(img->b);
-	cudaFree(img);
-
-}
-
-void free_img(image *img){
-
-	free(img->r);
-	free(img->g);
-	free(img->b);
-	free(img);
-
-}
-
-void localfilt(image *in, image *out, usint rows, usint cols, usint filt_size){
-
-	usint bdr_diff = filt_size/2, x, y;
-	short int i,j;
-	unsigned long int sum_r, sum_g, sum_b;
-
-	for (x = bdr_diff; x < rows+bdr_diff; x++){
-		for (y = bdr_diff; y < cols+bdr_diff; y++){
-			sum_r = 0; sum_g = 0; sum_b = 0;
-			for(i = -bdr_diff; i <= bdr_diff; i++){
-				for(j = -bdr_diff; j <= bdr_diff; j++){
-/*					sum_r += in->r[y-j][x-i];*/
-/*					sum_g += in->g[y-j][x-i];*/
-/*					sum_b += in->b[y-j][x-i];*/
-				}
-			}
-/*			out->r[y-bdr_diff][x-bdr_diff] = sum_r/(filt_size*filt_size);*/
-/*			out->g[y-bdr_diff][x-bdr_diff] = sum_g/(filt_size*filt_size);*/
-/*			out->b[y-bdr_diff][x-bdr_diff] = sum_b/(filt_size*filt_size);*/
-		}
+__global__ void col_add( int *img, int *cols_sum, int rows, int cols ) {
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	if(tid < (rows)*(cols+4)){ 
+		cols_sum[tid] = img[tid]+
+					img[tid+(cols+4)]+
+					img[tid+(2*(cols+4))]+
+					img[tid+(3*(cols+4))]+
+					img[tid+(4*(cols+4))];
 	}
+}
 
-/*	if(_DEBUG_) for(i=0;i<rows;++i){ for(j=0;j<cols;++j)*/
-/*				printf("%hu %hu %hu\t", out->r[j][i],out->g[j][i],out->b[j][i]); printf("\n");}*/
+__global__ void smooth(int *sum,int *out,int rows, int cols, int *c){
 
+	int tid = blockIdx.x * blockDim.x + threadIdx.x ; // cria id único para cada thread
+
+	if(tid < rows*cols){ // faz as somas necessárias
+		out[tid] = sum[tid+2+(4*(tid/cols))-2] + 
+				sum[tid+2+(4*(tid/cols))-1] + 
+				sum[tid+2+(4*(tid/cols))] +
+				sum[tid+2+(4*(tid/cols))+1] +
+				sum[tid+2+(4*(tid/cols))+2] ;
+		
+		// divide a soma pelo tamanha da mascara
+		out[tid] /= _FILT_SIZE_*_FILT_SIZE_;
+
+	}
 }
 
 int main(int argc, char** argv){
 
 	usint i = 0, j = 0, rows = 0, cols = 0, filt_size = 0, max_val = 0;
 	char format[3], img_name[500], hash[2];
-	image *in = NULL, *out = NULL;
+	int *in_r = NULL, *in_g = NULL, *in_b = NULL, *out_r = NULL, *out_g = NULL, *out_b = NULL;
 
 	/*Structure that is used to calculate the time that is taken to */
 	/*to execute the algorithm. We use this approach instead of the */
@@ -132,14 +95,14 @@ int main(int argc, char** argv){
 	/*different approach.*/
 	struct timeval t0, t1;
 
-
 	/*Read from the parameters if they changed the filter size, if  */
 	/*not use the default value of 5.                               */
 	if(2 > argc){
 		if(_DEBUG_) printf("No filter size provided, using default.\n");
 		filt_size = _FILT_SIZE_;
 	}else{
-		filt_size = (usint) atoi(argv[1]);
+		//filt_size = (usint) atoi(argv[1]);
+		filt_size = _FILT_SIZE_;
 	}
 
 	/*Start reading the image as ppm from the stdin*/
@@ -149,78 +112,75 @@ int main(int argc, char** argv){
 	scanf("%hu%hu%hu",&cols,&rows,&max_val);
 	if(_DEBUG_) printf("%hu %hu\n%hu\n",cols,rows, max_val);
 
-	in = (image *) malloc(sizeof(image));
-	allocate_img(in, cols+filt_size-1, rows+filt_size-1);
+	in_r = (int *) calloc(cols+4*rows+4,sizeof(usint));
+	in_g = (int *) calloc(cols+4*rows+4,sizeof(usint));
+	in_b = (int *) calloc(cols+4*rows+4,sizeof(usint));
 
 	/*Read the matrix from the stdin.*/
 	for(i = 0; i < rows; i++){
 		for(j = 0; j < cols; j++){
-			scanf("%hu%hu%hu",&in->r[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2],
-							  &in->g[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2],
-							  &in->b[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2]);
+			scanf("%d%d%d",&in_r[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2],
+							  &in_g[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2],
+							  &in_b[((i+filt_size/2)*(cols+filt_size-1))+j+filt_size/2]);
 		}
 	}
 
 	if(_DEBUG_) for(i=0;i<rows+filt_size-1;++i){ for(j=0;j<cols+filt_size-1;++j)
-				printf("%hu %hu %hu\t", in->r[(i*(cols+filt_size/2+1))+j+filt_size/2-1],
-										in->g[(i*(cols+filt_size/2+1))+j+filt_size/2-1],
-										in->b[(i*(cols+filt_size/2+1))+j+filt_size/2-1]);
+				printf("%d %d %d\t", in_r[(i*(cols+filt_size/2+1))+j+filt_size/2-1],
+										in_g[(i*(cols+filt_size/2+1))+j+filt_size/2-1],
+										in_b[(i*(cols+filt_size/2+1))+j+filt_size/2-1]);
 				printf("\n");}
 
-	out = (image *) malloc(sizeof(image));
-	allocate_img(out, cols, rows);
+	out_r = (int *) calloc(cols*rows,sizeof(usint));
+	out_g = (int *) calloc(cols*rows,sizeof(usint));
+	out_b = (int *) calloc(cols*rows,sizeof(usint));
 
 	/*Images that are goin to be used in the device.*/
-	image *dev_in = NULL,*dev_out = NULL;
+	int *dev_in = NULL, *dev_out = NULL;
+	int *sum, *c;
+
+	float numblocks;
+	int blocks;
+
+	if(cols > rows){
+		numblocks = (cols/_SIZE_F_)*rows;
+	}
+	else{
+		numblocks = (rows/_SIZE_F_)*cols;
+	}
+
+	blocks = (int) (numblocks + 1.0);
+
 
 	gettimeofday(&t0, NULL);
 
 	/*Allocates the memory needed in the device.*/
-	cudaMalloc( (void**)&dev_in, sizeof(image));
-	cudaMalloc( (void**)&dev_in->r, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *));
-	cudaMalloc( (void**)&dev_in->g, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *));
-	cudaMalloc( (void**)&dev_in->b, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *));
-
-	cudaMalloc( (void**)&dev_out, sizeof(image));
-	cudaMalloc( (void**)&dev_out->r, (rows)*(cols) * sizeof(usint *));
-	cudaMalloc( (void**)&dev_out->g, (rows)*(cols) * sizeof(usint *));
-	cudaMalloc( (void**)&dev_out->b, (rows)*(cols) * sizeof(usint *));
+	cudaMalloc( (void**)&dev_in, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(int));
+	cudaMalloc( (void**)&dev_out, (rows)*(cols) * sizeof(int));
+	cudaMalloc( (void**)&sum,(rows*(cols+4))*sizeof(int));
+	cudaMalloc( (void**)&c,(1*sizeof(int)));
 
 	/*Copy the image from the host to the device (CPU -> GPU)*/
-	cudaMemcpy( dev_in, in, sizeof(image), cudaMemcpyDeviceToHost);
-	cudaMemcpy( dev_in->r, in->r, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *), cudaMemcpyHostToDevice);
-	cudaMemcpy( dev_in->g, in->g, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *), cudaMemcpyHostToDevice);
-	cudaMemcpy( dev_in->b, in->b, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(usint *), cudaMemcpyHostToDevice);
+	cudaMemcpy( dev_in, in_r, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(int), cudaMemcpyHostToDevice);
+	col_add<<<blocks,_SIZE_>>>(dev_in,sum,rows,cols);
+	smooth<<<blocks,_SIZE_>>>(sum,dev_out,rows,cols,c);
+	cudaMemcpy(out_r, dev_out, rows*cols*sizeof(int), cudaMemcpyDeviceToHost);
+	
+	/*Copy the image from the host to the device (CPU -> GPU)*/
+	cudaMemcpy( dev_in, in_g, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(int), cudaMemcpyHostToDevice);
+	col_add<<<blocks,_SIZE_>>>(dev_in,sum,rows,cols);
+	smooth<<<blocks,_SIZE_>>>(sum,dev_out,rows,cols,c);
+	cudaMemcpy(out_g, dev_out, rows*cols*sizeof(int), cudaMemcpyDeviceToHost);
 
-	//http://mc.stanford.edu/cgi-bin/images/b/ba/M02_2.pdf
-	//http://mc.stanford.edu/cgi-bin/images/0/0a/M02_4.pdf
-	//http://mc.stanford.edu/cgi-bin/images/5/5f/Darve_cme343_cuda_2.pdf
-	//chama as funcoes assincronamente (quero fazer o mais facil)
-	//se for mais facil chamar uma por vez podemos usar so uma matriz de retorno
-	//dev_out que vai ser um usint de tamanho row*cols.
-	//e passar uma matrix de cada vez... um cudaMalloc num usint na placa e passa tudo pra ele
-	//pq os canais sao independentes
-	//ver se nao vai dar pau a alocacao da estrutura.. to com medo por causa do mpi q dava bosta...
+	/*Copy the image from the host to the device (CPU -> GPU)*/
+	cudaMemcpy( dev_in, in_b, (rows+filt_size-1)*(cols+filt_size-1)*sizeof(int), cudaMemcpyHostToDevice);
+	col_add<<<blocks,_SIZE_>>>(dev_in,sum,rows,cols);
+	smooth<<<blocks,_SIZE_>>>(sum,dev_out,rows,cols,c);
+	cudaMemcpy(out_b, dev_out, rows*cols*sizeof(int), cudaMemcpyDeviceToHost);
 
-	//1 - copiar as matrizes para a GPU (nao esquecer de alocar memoria na GPU) - Done (ver se ta fundando)
-	//2 - mais as flags necessarias (numero de threads, blocks, vao ser 3 grids (RGB)) - Aqui precisa definir o algoritmo q vai usar para as threads e talz
-	//3 - copiar para a shared memory a parte da matriz q vai (syncthreads) - melhora no speed up (aula)
-	//usar pra fazer o calculo (isso eh na funcao que vai ser executada na gpu)
-	//4 - inicializar 3 kernels (funcoes q vao ser executada na GPU) um para cada
-	// espectro de cor (RGB) - isso eh assincrono
-	//5 - Pesquisar com vai esperar o resultado dos kernels para poder salvar a imagem
-	// em disco com a copia do resultado da placa - FEITO
-
-	//essa eh a funcao q vai executar na GPU
-	//localfilt(in, out, rows, cols, filt_size);
-
-	cudaDeviceSynchronize();
+//	cudaDeviceSynchronize();
 
 	/*Copy the result from the device to the host. (GPU -> CPU)*/
-	cudaMemcpy(out, dev_out, sizeof(image), cudaMemcpyDeviceToHost);
-	cudaMemcpy(out->r, dev_out->r, rows*cols*sizeof(usint), cudaMemcpyDeviceToHost);
-	cudaMemcpy(out->g, dev_out->g, rows*cols*sizeof(usint), cudaMemcpyDeviceToHost);
-	cudaMemcpy(out->b, dev_out->b, rows*cols*sizeof(usint), cudaMemcpyDeviceToHost);
 
 	/*Point where the timer is stopped.*/
 	gettimeofday(&t1, NULL);
@@ -232,17 +192,24 @@ int main(int argc, char** argv){
 	printf("%hu %hu\n%hu\n", cols, rows, max_val);
 	for( i = 0; i < rows; i++){
 		for(j=0;j< cols-1; j++){
-			printf("%hu %hu %hu   ", out->r[i*cols+j],out->g[i*cols+j],out->b[i*cols+j]);
+			printf("%d %d %d   ", out_r[i*cols+j],out_g[i*cols+j],out_b[i*cols+j]);
 		}
-		printf("%hu %hu %hu", out->r[i*cols+j],out->g[i*cols+j],out->b[i*cols+j]);
+		printf("%d %d %d	", out_r[i*cols+j],out_g[i*cols+j],out_b[i*cols+j]);
 		printf("\n");
 	}
 
-	free_img(in);
-	free_img(out);
 
-	cuda_Free(dev_in);
-	cuda_Free(dev_out);
+	free(in_r);
+	free(in_g);
+	free(in_b);
+
+	free(out_r);
+	free(out_g);
+	free(out_b);
+
+	cudaFree(dev_in);
+	cudaFree(dev_out);
+	cudaFree(sum);
 
 	return EXIT_SUCCESS;
 }
